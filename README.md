@@ -1,6 +1,6 @@
 # jetson-min-disk
 
-Document generation status: [![pipeline status](https://gitlab-master.nvidia.com/cyato/jetson-min-disk/badges/main/pipeline.svg)](https://gitlab-master.nvidia.com/cyato/jetson-min-disk/-/commits/main)
+Document generation status: ![example workflow](https://github.com/NVIDIA-AI-IOT/jetson-min-disk/actions/workflows/ci.yml/badge.svg)
 
 This repo is to host the online guide for minimizing Jetson disk usage, and to host the associated scritps and assets.
 
