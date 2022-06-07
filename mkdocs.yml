@@ -1,4 +1,4 @@
-site_name: Guide for Minimizing Jetson Disk Usage 
+site_name: Guide to Minimizing Jetson Disk Usage 
 theme:
     name: "material"
     favicon: images/jetson-min-disk_favicon.png
@@ -65,7 +65,6 @@ nav:
   - "Step 3: Removing dev packages": step3.md 
   - "Option: Minimal L4T": minimal-l4t.md
   - "Verification": verification.md
-  - "References": references.md
 
 extra:
   analytics:
