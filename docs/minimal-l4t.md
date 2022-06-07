@@ -85,7 +85,7 @@ Jetson Linux r32.7.1 or earlier has nv_build_samplefs.sh that takes the text fil
     nv_build_samplefs.sh - cleanup
     ```
 
-To build your own minimal rootfs, you need to edit this packages file. For example, [here](https://gitlab-master.nvidia.com/cyato/jetson-min-disk/-/blob/main/assets/nvubuntu-bionic-minimal-aarch64-packages) is the sample list of packages that would make up a minimal configuration rootfs without Ubuntu desktop GUI for Rel-32.7.
+To build your own minimal rootfs, you need to edit this packages file. For example, [here](https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/assets/nvubuntu-bionic-minimal-aarch64-packages) is the sample list of packages that would make up a minimal configuration rootfs without Ubuntu desktop GUI for Rel-32.7.
 
 Build your custom RootFS using this custom list, use the generated tar file to set up the RootFS directory inside the Linux_for_Tegra directory.
 
