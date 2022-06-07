@@ -1,0 +1,74 @@
+site_name: Guide for Minimizing Jetson Disk Usage 
+theme:
+    name: "material"
+    favicon: images/jetson-min-disk_favicon.png
+    logo: images/jetson-min-disk_logo-white.png
+    font: Incosolata
+    palette:
+      - media: "(prefers-color-scheme: light)" 
+        scheme: nvgreen
+        toggle:
+            icon: material/toggle-switch-off-outline
+            name: Switch to dark mode
+      - media: "(prefers-color-scheme: dark)" 
+        scheme: slate
+        toggle:
+            icon: material/toggle-switch
+            name: Switch to light mode
+    features:
+       - navigation.indexes
+       - navigation.expand
+       - content.tabs.link
+
+repo_url: https://gitlab-master.nvidia.com/cyato/jetson-min-disk/
+
+plugins:
+  - search
+use_directory_urls: false
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - def_list
+  - md_in_html
+  - tables
+  - pymdownx.emoji:
+      emoji_index: !!python/name:materialx.emoji.twemoji
+      emoji_generator: !!python/name:materialx.emoji.to_svg
+  - pymdownx.critic
+  - pymdownx.caret
+  - pymdownx.keys
+  - pymdownx.mark
+  - pymdownx.tilde
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true 
+
+extra_css:
+  - css/colors.css
+
+nav:
+
+  - Home: index.md
+  - Introduction: intro.md
+  - Analyze Disk Usage: analysis.md
+  - Overview of Minimizing Steps: overview_minimizing_steps.md
+  - "Step 1: Removing GUI": step1.md
+  - "Step 2: Removing docs/sample": step2.md 
+  - "Step 3: Removing dev packages": step3.md 
+  - "Option: Minimal L4T": minimal-l4t.md
+  - "Verification": verification.md
+  - "References": references.md
+
+extra:
+  analytics:
+    provider: google
+    property: G-WB29HFW2FX
+  

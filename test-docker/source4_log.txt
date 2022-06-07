@@ -1,0 +1,109 @@
+root@xnx6-jp461:/opt/nvidia/deepstream/deepstream-6.0# deepstream-app -c samples/configs/deepstream-app-custom/source4.txt                                                                                  
+0:00:04.817562030   132     0x14994d30 INFO                 nvinfer gstnvinfer.cpp:638:gst_nvinfer_logger:<secondary_gie_2> NvDsInferContext[UID 6]: Info from NvDsInferContextImpl::deserializeEngineAndBac
+kend() <nvdsinfer_context_impl.cpp:1900> [UID = 6]: deserialized trt engine from :/opt/nvidia/deepstream/deepstream-6.0/samples/configs/deepstream-app-custom/../../models/Secondary_CarMake/resnet18.caffem
+odel_b16_gpu0_int8.engine                                                                                                                                                                                   
+INFO: [Implicit Engine Info]: layers num: 2                                                                                                                                                                 
+0   INPUT  kFLOAT input_1         3x224x224                                                                                                                                                                 
+1   OUTPUT kFLOAT predictions/Softmax 20x1x1                                                                                                                                                                
+                                                                                                                                                                                                            
+0:00:04.832660787   132     0x14994d30 INFO                 nvinfer gstnvinfer.cpp:638:gst_nvinfer_logger:<secondary_gie_2> NvDsInferContext[UID 6]: Info from NvDsInferContextImpl::generateBackendContext(
+) <nvdsinfer_context_impl.cpp:2004> [UID = 6]: Use deserialized engine model: /opt/nvidia/deepstream/deepstream-6.0/samples/configs/deepstream-app-custom/../../models/Secondary_CarMake/resnet18.caffemodel
+_b16_gpu0_int8.engine                                                                                                                                                                                       
+0:00:04.851926663   132     0x14994d30 INFO                 nvinfer gstnvinfer_impl.cpp:313:notifyLoadModelStatus:<secondary_gie_2> [UID 6]: Load new model:/opt/nvidia/deepstream/deepstream-6.0/samples/co
+nfigs/deepstream-app-custom/config_infer_secondary_carmake.txt sucessfully                                                                                                                                  
+0:00:05.326259131   132     0x14994d30 INFO                 nvinfer gstnvinfer.cpp:638:gst_nvinfer_logger:<secondary_gie_1> NvDsInferContext[UID 5]: Info from NvDsInferContextImpl::deserializeEngineAndBac
+kend() <nvdsinfer_context_impl.cpp:1900> [UID = 5]: deserialized trt engine from :/opt/nvidia/deepstream/deepstream-6.0/samples/configs/deepstream-app-custom/../../models/Secondary_CarColor/resnet18.caffe
+model_b16_gpu0_int8.engine                                                                                                                                                                                  
+INFO: [Implicit Engine Info]: layers num: 2                                                                                                                                                                 
+0   INPUT  kFLOAT input_1         3x224x224                                                                                                                                                                 
+1   OUTPUT kFLOAT predictions/Softmax 12x1x1                                                                                                                                                                
+                                                                                                                                                                                                            
+0:00:05.341347168   132     0x14994d30 INFO                 nvinfer gstnvinfer.cpp:638:gst_nvinfer_logger:<secondary_gie_1> NvDsInferContext[UID 5]: Info from NvDsInferContextImpl::generateBackendContext(
+) <nvdsinfer_context_impl.cpp:2004> [UID = 5]: Use deserialized engine model: /opt/nvidia/deepstream/deepstream-6.0/samples/configs/deepstream-app-custom/../../models/Secondary_CarColor/resnet18.caffemode
+l_b16_gpu0_int8.engine                                                                                                                                                                                      
+0:00:05.353252337   132     0x14994d30 INFO                 nvinfer gstnvinfer_impl.cpp:313:notifyLoadModelStatus:<secondary_gie_1> [UID 5]: Load new model:/opt/nvidia/deepstream/deepstream-6.0/samples/co
+nfigs/deepstream-app-custom/config_infer_secondary_carcolor.txt sucessfully                                                                                                                                 
+0:00:05.747987747   132     0x14994d30 INFO                 nvinfer gstnvinfer.cpp:638:gst_nvinfer_logger:<secondary_gie_0> NvDsInferContext[UID 4]: Info from NvDsInferContextImpl::deserializeEngineAndBac
+kend() <nvdsinfer_context_impl.cpp:1900> [UID = 4]: deserialized trt engine from :/opt/nvidia/deepstream/deepstream-6.0/samples/configs/deepstream-app-custom/../../models/Secondary_VehicleTypes/resnet18.c
+affemodel_b16_gpu0_int8.engine                                                                                                                                                                              
+INFO: [Implicit Engine Info]: layers num: 2                                                                                                                                                                 
+0   INPUT  kFLOAT input_1         3x224x224                                                                                                                                                                 
+1   OUTPUT kFLOAT predictions/Softmax 6x1x1                                                                                                                                                                 
+                                                                                                                                                                                                            
+0:00:05.762753993   132     0x14994d30 INFO                 nvinfer gstnvinfer.cpp:638:gst_nvinfer_logger:<secondary_gie_0> NvDsInferContext[UID 4]: Info from NvDsInferContextImpl::generateBackendContext(
+) <nvdsinfer_context_impl.cpp:2004> [UID = 4]: Use deserialized engine model: /opt/nvidia/deepstream/deepstream-6.0/samples/configs/deepstream-app-custom/../../models/Secondary_VehicleTypes/resnet18.caffe
+model_b16_gpu0_int8.engine                                                                                                                                                                                  
+0:00:05.774993913   132     0x14994d30 INFO                 nvinfer gstnvinfer_impl.cpp:313:notifyLoadModelStatus:<secondary_gie_0> [UID 4]: Load new model:/opt/nvidia/deepstream/deepstream-6.0/samples/co
+nfigs/deepstream-app-custom/config_infer_secondary_vehicletypes.txt sucessfully                                                                                                                             
+gstnvtracker: Loading low-level lib at /opt/nvidia/deepstream/deepstream-6.0/lib/libnvds_nvmultiobjecttracker.so                                                                                            
+~~ CLOG[/dvs/git/dirty/git-master_linux/deepstream/sdk/src/utils/nvmultiobjecttracker/include/modules/NvMultiObjectTracker/NvTrackerParams.hpp, getConfigRoot() @line 54]: [NvTrackerParams::getConfigRoot()
+] !!![WARNING] Invalid low-level config file caused an exception, but will go ahead with the default config values                                                                                          
+gstnvtracker: Batch processing is ON                                                                                                                                                                        
+gstnvtracker: Past frame output is ON                                                                                                                                                                       
+~~ CLOG[/dvs/git/dirty/git-master_linux/deepstream/sdk/src/utils/nvmultiobjecttracker/include/modules/NvMultiObjectTracker/NvTrackerParams.hpp, getConfigRoot() @line 54]: [NvTrackerParams::getConfigRoot()
+] !!![WARNING] Invalid low-level config file caused an exception, but will go ahead with the default config values                                                                                          
+[NvMultiObjectTracker] Initialized                                                                                                                                                                          
+0:00:06.187356171   132     0x14994d30 INFO                 nvinfer gstnvinfer.cpp:638:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::deserializeEngineAndBackend
+() <nvdsinfer_context_impl.cpp:1900> [UID = 1]: deserialized trt engine from :/opt/nvidia/deepstream/deepstream-6.0/samples/configs/deepstream-app-custom/../../models/Primary_Detector/resnet10.caffemodel_
+b4_gpu0_int8.engine                                                                                                                                                                                         
+INFO: [Implicit Engine Info]: layers num: 3                                                                                                                                                                 
+0   INPUT  kFLOAT input_1         3x368x640                                                                                                                                                                 
+1   OUTPUT kFLOAT conv2d_bbox     16x23x40                                                                                                                                                                  
+2   OUTPUT kFLOAT conv2d_cov/Sigmoid 4x23x40                                                                                                                                                                
+                                                                                                                                                                                                            
+0:00:06.201822418   132     0x14994d30 INFO                 nvinfer gstnvinfer.cpp:638:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::generateBackendContext() <n
+vdsinfer_context_impl.cpp:2004> [UID = 1]: Use deserialized engine model: /opt/nvidia/deepstream/deepstream-6.0/samples/configs/deepstream-app-custom/../../models/Primary_Detector/resnet10.caffemodel_b4_g
+pu0_int8.engine                                                                                                                                                                                             
+0:00:06.209554004   132     0x14994d30 INFO                 nvinfer gstnvinfer_impl.cpp:313:notifyLoadModelStatus:<primary_gie> [UID 1]: Load new model:/opt/nvidia/deepstream/deepstream-6.0/samples/config
+s/deepstream-app-custom/config_infer_primary.txt sucessfully
+
+Runtime commands:
+        h: Print this help
+        q: Quit
+
+        p: Pause
+        r: Resume
+
+NOTE: To expand a source in the 2D tiled display and view object details, left-click on the source.
+      To go back to the tiled display, right-click anywhere on the window.
+
+
+**PERF:  FPS 0 (Avg)    FPS 1 (Avg)     FPS 2 (Avg)     FPS 3 (Avg)
+**PERF:  0.00 (0.00)    0.00 (0.00)     0.00 (0.00)     0.00 (0.00)
+** INFO: <bus_callback:194>: Pipeline ready
+
+Opening in BLOCKING MODE
+Opening in BLOCKING MODE
+Opening in BLOCKING MODE
+Opening in BLOCKING MODE
+NvMMLiteOpen : Block : BlockType = 261
+NvMMLiteOpen : Block : BlockType = 261
+NvMMLiteOpen : Block : BlockType = 261
+NvMMLiteOpen : Block : BlockType = 261
+NVMEDIA: Reading vendor.tegra.display-size : status: 6
+NVMEDIA: Reading vendor.tegra.display-size : status: 6
+NVMEDIA: Reading vendor.tegra.display-size : status: 6
+NvMMLiteBlockCreate : Block : BlockType = 261
+NVMEDIA: Reading vendor.tegra.display-size : status: 6
+NvMMLiteBlockCreate : Block : BlockType = 261
+NvMMLiteBlockCreate : Block : BlockType = 261
+NvMMLiteBlockCreate : Block : BlockType = 261
+** INFO: <bus_callback:180>: Pipeline running
+
+**PERF:  33.11 (33.02)  33.11 (33.02)   33.11 (33.02)   33.11 (33.02)
+**PERF:  29.97 (31.41)  29.97 (31.41)   29.97 (31.41)   29.97 (31.41)
+**PERF:  30.07 (30.92)  30.07 (30.92)   30.07 (30.92)   30.07 (30.92)
+**PERF:  29.96 (30.68)  29.96 (30.68)   29.96 (30.68)   29.96 (30.68)
+**PERF:  30.08 (30.54)  30.08 (30.54)   30.08 (30.54)   30.08 (30.54)
+**PERF:  29.93 (30.45)  29.93 (30.45)   29.93 (30.45)   29.93 (30.45)
+**PERF:  30.05 (30.38)  30.05 (30.38)   30.05 (30.38)   30.05 (30.38)
+**PERF:  29.89 (30.34)  29.89 (30.34)   29.89 (30.34)   29.89 (30.34)
+**PERF:  29.99 (30.30)  29.99 (30.30)   29.99 (30.30)   29.99 (30.30)
+** INFO: <bus_callback:217>: Received EOS. Exiting ...
+
+Quitting
+[NvMultiObjectTracker] De-initialized
+App run successful
+root@xnx6-jp461:/opt/nvidia/deepstream/deepstream-6.0# exit
+exit
+jetson@xnx6-jp461:~$ sudo docker images ls
