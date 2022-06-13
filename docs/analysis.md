@@ -1269,6 +1269,139 @@ dpkg-query -Wf '${Installed-Size;8} KiB \t${Package;-30}\t${binary:Summary}\n'
 		 588 KiB 	zlib1g-dev                    	compression library - development
     ```
 
+### `dpkg-query` to list NVIDIA packages
+
+```
+dpkg-query -Wf '${Installed-Size;8} KiB \t${Package;-30}\t${Maintainer}\n' | grep nvidia 
+```
+
+??? info ":material-numeric-5-box-multiple:  Example output of the `dpkg-query` command to list NVIDIA packages on Jetson AGX Orin Developer Kit with JetPack 5.0.1 DP (Full JetPack components):"
+
+    ```
+	   12351 KiB 	cuda-cccl-11-4                	cudatools <cudatools@nvidia.com>
+		   7 KiB 	cuda-command-line-tools-11-4  	cudatools <cudatools@nvidia.com>
+		   7 KiB 	cuda-compiler-11-4            	cudatools <cudatools@nvidia.com>
+		 731 KiB 	cuda-cudart-11-4              	cudatools <cudatools@nvidia.com>
+		4963 KiB 	cuda-cudart-dev-11-4          	cudatools <cudatools@nvidia.com>
+		 279 KiB 	cuda-cuobjdump-11-4           	cudatools <cudatools@nvidia.com>
+	   21777 KiB 	cuda-cupti-11-4               	cudatools <cudatools@nvidia.com>
+		1308 KiB 	cuda-cupti-dev-11-4           	cudatools <cudatools@nvidia.com>
+		1553 KiB 	cuda-cuxxfilt-11-4            	cudatools <cudatools@nvidia.com>
+		 378 KiB 	cuda-documentation-11-4       	cudatools <cudatools@nvidia.com>
+		 131 KiB 	cuda-driver-dev-11-4          	cudatools <cudatools@nvidia.com>
+	   13984 KiB 	cuda-gdb-11-4                 	cudatools <cudatools@nvidia.com>
+		   7 KiB 	cuda-libraries-11-4           	cudatools <cudatools@nvidia.com>
+		   7 KiB 	cuda-libraries-dev-11-4       	cudatools <cudatools@nvidia.com>
+	  100442 KiB 	cuda-nvcc-11-4                	cudatools <cudatools@nvidia.com>
+	   32610 KiB 	cuda-nvdisasm-11-4            	cudatools <cudatools@nvidia.com>
+		 559 KiB 	cuda-nvml-dev-11-4            	cudatools <cudatools@nvidia.com>
+		  88 KiB 	cuda-nvprof-11-4              	cudatools <cudatools@nvidia.com>
+		 154 KiB 	cuda-nvprune-11-4             	cudatools <cudatools@nvidia.com>
+	   46801 KiB 	cuda-nvrtc-11-4               	cudatools <cudatools@nvidia.com>
+		 117 KiB 	cuda-nvrtc-dev-11-4           	cudatools <cudatools@nvidia.com>
+		 444 KiB 	cuda-nvtx-11-4                	cudatools <cudatools@nvidia.com>
+	  161640 KiB 	cuda-samples-11-4             	cudatools <cudatools@nvidia.com>
+	   26027 KiB 	cuda-sanitizer-11-4           	cudatools <cudatools@nvidia.com>
+		  14 KiB 	cuda-toolkit-11-4             	cudatools <cudatools@nvidia.com>
+		  70 KiB 	cuda-toolkit-11-4-config-commo	cudatools <cudatools@nvidia.com>
+		  74 KiB 	cuda-toolkit-11-config-common 	cudatools <cudatools@nvidia.com>
+		  74 KiB 	cuda-toolkit-config-common    	cudatools <cudatools@nvidia.com>
+		   7 KiB 	cuda-tools-11-4               	cudatools <cudatools@nvidia.com>
+		  10 KiB 	cuda-visual-tools-11-4        	cudatools <cudatools@nvidia.com>
+		  81 KiB 	graphsurgeon-tf               	cudatools <cudatools@nvidia.com>
+		  52 KiB 	jetson-gpio-common            	NVIDIA Corporation <linux-tegra-bugs@nvidia.com>
+	  527675 KiB 	libcublas-11-4                	cudatools <cudatools@nvidia.com>
+	  699018 KiB 	libcublas-dev-11-4            	cudatools <cudatools@nvidia.com>
+		 232 KiB 	libcudla-11-4                 	cudatools <cudatools@nvidia.com>
+		 111 KiB 	libcudla-dev-11-4             	cudatools <cudatools@nvidia.com>
+	 1419681 KiB 	libcudnn8                     	cudatools <cudatools@nvidia.com>
+	 1718597 KiB 	libcudnn8-dev                 	cudatools <cudatools@nvidia.com>
+		2117 KiB 	libcudnn8-samples             	cudatools <cudatools@nvidia.com>
+	  171408 KiB 	libcufft-11-4                 	cudatools <cudatools@nvidia.com>
+	  393703 KiB 	libcufft-dev-11-4             	cudatools <cudatools@nvidia.com>
+	   79647 KiB 	libcurand-11-4                	cudatools <cudatools@nvidia.com>
+	   81676 KiB 	libcurand-dev-11-4            	cudatools <cudatools@nvidia.com>
+	  466273 KiB 	libcusolver-11-4              	cudatools <cudatools@nvidia.com>
+	  223245 KiB 	libcusolver-dev-11-4          	cudatools <cudatools@nvidia.com>
+	  225282 KiB 	libcusparse-11-4              	cudatools <cudatools@nvidia.com>
+	  251151 KiB 	libcusparse-dev-11-4          	cudatools <cudatools@nvidia.com>
+	  207464 KiB 	libnpp-11-4                   	cudatools <cudatools@nvidia.com>
+	  219342 KiB 	libnpp-dev-11-4               	cudatools <cudatools@nvidia.com>
+		  67 KiB 	libnvidia-container-tools     	NVIDIA CORPORATION <cudatools@nvidia.com>
+		 163 KiB 	libnvidia-container0          	NVIDIA CORPORATION <cudatools@nvidia.com>
+		3082 KiB 	libnvidia-container1          	NVIDIA CORPORATION <cudatools@nvidia.com>
+		 458 KiB 	libnvinfer-bin                	cudatools <cudatools@nvidia.com>
+	 1157390 KiB 	libnvinfer-dev                	cudatools <cudatools@nvidia.com>
+	   15924 KiB 	libnvinfer-doc                	cudatools <cudatools@nvidia.com>
+	   29878 KiB 	libnvinfer-plugin-dev         	cudatools <cudatools@nvidia.com>
+	   27016 KiB 	libnvinfer-plugin8            	cudatools <cudatools@nvidia.com>
+	  536874 KiB 	libnvinfer-samples            	cudatools <cudatools@nvidia.com>
+	  694687 KiB 	libnvinfer8                   	cudatools <cudatools@nvidia.com>
+		2759 KiB 	libnvonnxparsers-dev          	cudatools <cudatools@nvidia.com>
+		2760 KiB 	libnvonnxparsers8             	cudatools <cudatools@nvidia.com>
+		4730 KiB 	libnvparsers-dev              	cudatools <cudatools@nvidia.com>
+		3374 KiB 	libnvparsers8                 	cudatools <cudatools@nvidia.com>
+	  131734 KiB 	libnvvpi2                     	VPI Support <vpi-support@nvidia.com>
+			 KiB 	nsight-systems-2022.2.3       	Feedback <nsight-systems@nvidia.com>
+		 194 KiB 	nvidia-container              	NVIDIA Corporation
+		  21 KiB 	nvidia-container-runtime      	NVIDIA CORPORATION <cudatools@nvidia.com>
+		4224 KiB 	nvidia-container-toolkit      	NVIDIA CORPORATION <cudatools@nvidia.com>
+		 224 KiB 	nvidia-cuda                   	NVIDIA Corporation
+		 175 KiB 	nvidia-cudnn8                 	NVIDIA Corporation
+		  27 KiB 	nvidia-docker2                	NVIDIA CORPORATION <cudatools@nvidia.com>
+		 194 KiB 	nvidia-jetpack                	NVIDIA Corporation
+	  159907 KiB 	nvidia-l4t-3d-core            	NVIDIA Corporation
+		  31 KiB 	nvidia-l4t-apt-source         	NVIDIA Corporation
+	  196453 KiB 	nvidia-l4t-bootloader         	NVIDIA Corporation
+	   20657 KiB 	nvidia-l4t-camera             	NVIDIA Corporation
+		1506 KiB 	nvidia-l4t-configs            	NVIDIA Corporation
+		9392 KiB 	nvidia-l4t-core               	NVIDIA Corporation
+	   22694 KiB 	nvidia-l4t-cuda               	NVIDIA Corporation
+		4479 KiB 	nvidia-l4t-display-kernel     	NVIDIA Corporation
+	   14546 KiB 	nvidia-l4t-firmware           	NVIDIA Corporation
+		  38 KiB 	nvidia-l4t-gputools           	NVIDIA Corporation
+	   69520 KiB 	nvidia-l4t-graphics-demos     	NVIDIA Corporation
+		3698 KiB 	nvidia-l4t-gstreamer          	NVIDIA Corporation
+	   16722 KiB 	nvidia-l4t-init               	NVIDIA Corporation
+	   16419 KiB 	nvidia-l4t-initrd             	NVIDIA Corporation
+		 134 KiB 	nvidia-l4t-jetson-io          	NVIDIA Corporation
+	   93611 KiB 	nvidia-l4t-jetson-multimedia-a	NVIDIA Corporation
+		 159 KiB 	nvidia-l4t-jetsonpower-gui-too	NVIDIA Corporation
+	  234499 KiB 	nvidia-l4t-kernel             	NVIDIA Corporation
+		2941 KiB 	nvidia-l4t-kernel-dtbs        	NVIDIA Corporation
+	   70435 KiB 	nvidia-l4t-kernel-headers     	NVIDIA Corporation
+		 596 KiB 	nvidia-l4t-libvulkan          	NVIDIA Corporation
+	   29841 KiB 	nvidia-l4t-multimedia         	NVIDIA Corporation
+		 742 KiB 	nvidia-l4t-multimedia-utils   	NVIDIA Corporation
+		  59 KiB 	nvidia-l4t-nvfancontrol       	NVIDIA Corporation
+		 198 KiB 	nvidia-l4t-nvpmodel           	NVIDIA Corporation
+		  86 KiB 	nvidia-l4t-nvpmodel-gui-tools 	NVIDIA Corporation
+		 903 KiB 	nvidia-l4t-nvsci              	NVIDIA Corporation
+		 110 KiB 	nvidia-l4t-oem-config         	NVIDIA Corporation
+		6290 KiB 	nvidia-l4t-optee              	NVIDIA Corporation
+		  81 KiB 	nvidia-l4t-pva                	NVIDIA Corporation
+		3289 KiB 	nvidia-l4t-tools              	NVIDIA Corporation
+		  77 KiB 	nvidia-l4t-wayland            	NVIDIA Corporation
+		4682 KiB 	nvidia-l4t-weston             	NVIDIA Corporation
+		 226 KiB 	nvidia-l4t-x11                	NVIDIA Corporation
+		 602 KiB 	nvidia-l4t-xusb-firmware      	NVIDIA Corporation
+		 194 KiB 	nvidia-nsight-sys             	NVIDIA Corporation
+		 194 KiB 	nvidia-opencv                 	NVIDIA Corporation
+		 200 KiB 	nvidia-tensorrt               	NVIDIA Corporation
+		 194 KiB 	nvidia-vpi                    	NVIDIA Corporation
+		 105 KiB 	python-jetson-gpio            	NVIDIA Corporation <linux-tegra-bugs@nvidia.com>
+		 105 KiB 	python3-jetson-gpio           	NVIDIA Corporation <linux-tegra-bugs@nvidia.com>
+		3205 KiB 	python3-libnvinfer            	cudatools <cudatools@nvidia.com>
+		  10 KiB 	python3-libnvinfer-dev        	cudatools <cudatools@nvidia.com>
+		3109 KiB 	python3.8-vpi2                	VPI Support <vpi-support@nvidia.com>
+		3113 KiB 	python3.9-vpi2                	VPI Support <vpi-support@nvidia.com>
+		  11 KiB 	tensorrt                      	cudatools <cudatools@nvidia.com>
+		 217 KiB 	uff-converter-tf              	cudatools <cudatools@nvidia.com>
+	   35913 KiB 	vpi2-demos                    	VPI Support <vpi-support@nvidia.com>
+		 654 KiB 	vpi2-dev                      	VPI Support <vpi-support@nvidia.com>
+	   15169 KiB 	vpi2-samples                  	VPI Support <vpi-support@nvidia.com>
+	```
+
 ## Understanding Package Dependencies
 
 ### Generating Dependency Graph
