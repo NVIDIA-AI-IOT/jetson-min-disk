@@ -1402,6 +1402,12 @@ dpkg-query -Wf '${Installed-Size;8} KiB \t${Package;-30}\t${Maintainer}\n' | gre
 	   15169 KiB 	vpi2-samples                  	VPI Support <vpi-support@nvidia.com>
 	```
 
+#### Save in CSV
+
+```
+dpkg-query -Wf '${Installed-Size;8} KiB,\t${Package;-30},\t${Maintainer},\t${Depends},\t${Pre-depends}\n' | grep nvidia > dpkg_nvidia_packages.csv 
+```
+
 ## Understanding Package Dependencies
 
 ### Generating Dependency Graph
