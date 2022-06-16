@@ -20,7 +20,7 @@ theme:
        - navigation.expand
        - content.tabs.link
 
-repo_url: https://gitlab-master.nvidia.com/cyato/jetson-min-disk/
+repo_url: https://github.com/NVIDIA-AI-IOT/jetson-min-disk
 
 plugins:
   - search
