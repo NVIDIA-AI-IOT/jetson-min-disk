@@ -165,7 +165,7 @@ You find text files `nvubuntu-focal-desktop-aarch64-packages` and `nvubuntu-foca
 		sudo tar xpf ${SAMPLE_FS_PACKAGE}
 		cd ..
 		sudo ./apply_binaries.sh
-		cd tools/
+		cd ./tools/
 		sudo ./l4t_create_default_user.sh -u {USERNAME} -p {PASSWORD} -n {HOSTNAME} ‑‑accept-license --autologin
 		cd ..
 		```
