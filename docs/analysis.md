@@ -1269,6 +1269,12 @@ dpkg-query -Wf '${Installed-Size;8} KiB \t${Package;-30}\t${binary:Summary}\n'
 		 588 KiB 	zlib1g-dev                    	compression library - development
     ```
 
+#### `dpkg-query` sorted by package size 
+
+```
+dpkg-query -Wf '${Installed-Size;8} KiB \t${Package;-30}\t${binary:Summary}\n' | sort -n -t$'\t' -k 1,1
+```
+
 ### `dpkg-query` to list NVIDIA packages
 
 ```
