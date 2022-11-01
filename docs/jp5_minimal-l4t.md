@@ -7,7 +7,7 @@ You can create a minimized configuration of L4T by reducing the standard Debian 
     | <img width=240/> | JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson AGX Orin<br>Developer Kit | JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson AGX Xavier<br>Developer Kit | JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson Xavier NX<br>Developer Kit |
     |---|--:|--:|--:|
     | *Base L4T* | 5.6 GB | nnn GB | 5.6 GB  |
-    | ***minplus*** flavor L4T | {==2.7 GB==} | {==nnn GB==} | {==nnn GB==} |
+    | ***minplus*** flavor L4T | {==2.7 GB==} | {==nnn GB==} | {==2.6 GB==} |
     | ***bone300*** flavor L4T | {==682 MB==} | {==nnn GB==} | {==670 GB==} |
 
 ## L4T composition

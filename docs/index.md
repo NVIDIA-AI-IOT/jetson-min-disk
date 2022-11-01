@@ -21,9 +21,9 @@ The amount of disk space you can save varies based on the configuration you choo
 
     | <img width=200/> | Disk Space Used | Available Space | Available Percentage |
     |---|--:|--:|--:|
-    | Full JetPack | 16.6 GB | **38 GB** | 30%  |
-    | Base L4T | 5.6 GB | **49 GB** | 11% |
-    | **Minimized L4T** | {==682 MB==} | {==**54 GB**==} | {==1.2%==} |
+    | Full JetPack | 16.6 GB | **38 GB** | 70%  |
+    | Base L4T | 5.6 GB | **49 GB** | 89% |
+    | **Minimized L4T** | {==682 MB==} | {==**54 GB**==} | {==98%==} |
 
 !!! info "Example on Jetson Xavier NX production module with JetPack 4.6.2"
 
