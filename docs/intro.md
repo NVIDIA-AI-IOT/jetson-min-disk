@@ -24,6 +24,16 @@ However you can cut down on disk usage by removing unnecessary packages, librari
     | Example Deployment Configuration (`[D]`) | 8.3 GB | 5.2 GB | 5.3 GB  |
     | **Reduction (`[A]` → `[D]`)** | **{++8.3 GB++}** | **{++6.4 GB++}** | **{++6.3 GB++}**  |
 
+And if you are on JetPack 5.0.2 or later, you can easily achieve decently minimal configuration by utilizing the newly introduced `nvidia-jetpack-runtime` meta package to install only the runtime oriented JetPack components on top of L4T.
+
+!!! example ""
+
+    | <img width=240/> | JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson AGX Orin<br>Developer Kit | JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson AGX Xavier<br>Developer Kit | JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson Xavier NX<br>Developer Kit |
+    |---|--:|--:|--:|
+    | (Original) Full JetPack (`[A]`)  | {==16.6 GB==} | {==11.6 GB==} | {==11.6GB==} |
+    | JetPack - **Runtime** | 9.7 GB | nnn GB | nnn GB  |
+    | **Reduction** | **{++7 GB++}** | **{++nnn GB++}** | **{++nnn GB++}**  |
+
 This guide details steps to minimize the disk usage on your Jetson, while sharing tips on analyzing disk usage, actual commands, and the example outputs on different versions of JetPack, so that you can assess how you can further optimize the disk usage for your application.
 
 We also shows how to check if an AI application is still working functionally under the slimmed-down configuration.

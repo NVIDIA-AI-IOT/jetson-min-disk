@@ -59,12 +59,19 @@ nav:
   - Home: index.md
   - Introduction: intro.md
   - Analyze Disk Usage: analysis.md
-  - Overview of Minimizing Steps: overview_minimizing_steps.md
-  - "Step 1: Removing GUI": step1.md
-  - "Step 2: Removing docs/sample": step2.md 
-  - "Step 3: Removing dev packages": step3.md 
+  - "For JetPack 5.x":
+    - "JetPack Runtime": jp5_jetpack-runtime.md
+    - "nvidia-container only": jp5_container-only.md
+    - "Minimized L4T": jp5_minimal-l4t.md 
+    - "Verification": jp5_verification.md
+  - "For JetPack 4.x (and 5.x)":
+    - Overview of Minimizing Steps: overview_minimizing_steps.md
+    - "Step 1: Removing GUI": step1.md
+    - "Step 2: Removing docs/sample": step2.md 
+    - "Step 3: Removing dev packages": step3.md 
+    - "Verification": verification.md
   - "Option: Minimal L4T": minimal-l4t.md
-  - "Verification": verification.md
+  - "References": references.md
 
 extra:
   analytics:

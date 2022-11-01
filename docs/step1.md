@@ -16,7 +16,7 @@ You can even remove `ubuntu-desktop` if you know your system does not require GU
 
 === ":material-numeric-4-box-multiple-outline: JetPack 4.6.x"
 
-    Download [nvubuntu-bionic-packages_only-in-desktop.txt](https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/assets/nvubuntu-bionic-minimal-aarch64-packages).
+    Download [nvubuntu-bionic-packages_only-in-desktop.txt](https://gitlab-master.nvidia.com/cyato/jetson-min-disk/-/blob/main/assets/nvubuntu-bionic-packages_only-in-desktop.txt).
 
     ```
     sudo apt-get update
@@ -26,7 +26,7 @@ You can even remove `ubuntu-desktop` if you know your system does not require GU
 
 === ":material-numeric-5-box-multiple: JetPack 5.0.x DP"
 
-    Download [nvubuntu-focal-packages_only-in-desktop.txt](https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/assets/nvubuntu-focal-packages_only-in-desktop.txt).
+    Download [nvubuntu-focal-packages_only-in-desktop.txt](https://gitlab-master.nvidia.com/cyato/jetson-min-disk/-/blob/main/assets/nvubuntu-focal-packages_only-in-desktop.txt).
 
     ```
     sudo apt-get update
