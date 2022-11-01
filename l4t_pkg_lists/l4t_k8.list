@@ -1,0 +1,10 @@
+nvidia-l4t-kernel
+nvidia-l4t-kernel-dtbs
+nvidia-l4t-apt-source
+nvidia-l4t-core
+nvidia-l4t-init
+nvidia-l4t-configs
+nvidia-l4t-nvfancontrol
+nvidia-l4t-cuda
+nvidia-l4t-firmware
+nvidia-l4t-tools

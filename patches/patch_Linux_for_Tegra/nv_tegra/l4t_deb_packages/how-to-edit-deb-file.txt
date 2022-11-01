@@ -1,0 +1,12 @@
+fakeroot sh -c '
+  mkdir tmp
+  dpkg-deb -R nvidia-l4t-cuda_35.1.0-20220825113828_arm64.deb tmp
+  # edit DEBIAN/postinst
+  dpkg-deb -b tmp nvidia-l4t-cuda_35.1.0-notegralib_arm64.deb.deb
+'
+
+
+dpkg-deb -R nvidia-l4t-core_35.1.0-20220825113828_arm64.deb tmp
+# remove dependency 
+# remove lib/tegra
+dpkg-deb -b tmp nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
