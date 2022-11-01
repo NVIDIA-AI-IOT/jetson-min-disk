@@ -2,7 +2,7 @@
 
 !!! note "News"
 
-    2022-11-01: Updated with JetPack 5.x specific contents, which is covered in [JetPack 5 webinar series](https://gateway.on24.com/wcc/experience/elitenvidiabrill/1407606/3944300/jetpack-502).
+    2022-11-01: Updated with JetPack 5.x specific contents, which are covered in [JetPack 5 webinar series](https://gateway.on24.com/wcc/experience/elitenvidiabrill/1407606/3944300/jetpack-502).
 
 
 ![](./images/feature-image_available-disk-image-transition.png)

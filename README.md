@@ -2,19 +2,26 @@
 
 Document generation status: ![example workflow](https://github.com/NVIDIA-AI-IOT/jetson-min-disk/actions/workflows/ci.yml/badge.svg)
 
-This repo is to host the online guide for minimizing Jetson disk usage, and to host the associated scritps and assets.
+This repo is to host the online guide for minimizing Jetson disk usage, and to host the associated scripts and assets.
 
-## Full Documentation (internally hosted for now)
+## Full Documentation 
 https://nvidia-ai-iot.github.io/jetson-min-disk/
 
 ## About this repo
 
 This repo is host two things;
 
-1. Online user guide for "Minimizing Jetson's Disk Usage (Full)".
-2. Scripts and text files being referenced in the guide/article
+1. Online documentation "Guide to Minimizing Jetson Disk Usage".
+2. Scripts and text files being referenced in the guide, and supported files and directories.
 
-## How to use this repo
+## How to use scripts
+
+### `prepare_l4t_dir.sh`
+
+See ["Minimized L4T" configuration for JetPack 5.x page](https://nvidia-ai-iot.github.io/jetson-min-disk/jp5_minimal-l4t.html). 
+
+
+## How to use this repo for docs
 
 ### Mkdocs: Initial setup
 
