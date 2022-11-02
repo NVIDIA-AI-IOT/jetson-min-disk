@@ -1,6 +1,7 @@
 # "Minimized L4T" configuration for JetPack 5.x
 
-You can create a minimized configuration of L4T by reducing the standard Debian packages that composes the base RootFS image or/and by reducing the `nvidia-l4t` specific packages installed on top of the RootFS image to foam L4T. 
+You can create a minimized configuration of L4T by reducing the standard Debian packages that composes the base RootFS image or/and by reducing the `nvidia-l4t` specific packages installed on top of the RootFS image to foam L4T. <br>
+You may need to installed some of the removed `nvidia-l4t` packages on the container side.
 
 !!! example "Disk space used for JetPack Runtime configuration"
 
@@ -110,7 +111,6 @@ Use a L4T utility script to prepare the customized `Linux_for_Tegra` directory.
         sudo ./flash.sh ${BOARD} mmcblk0p1
         ```
 
-
 ### Step 2. Install `nvidia-container`
 
 After flashing is done, boot your Jetson, and execute the following.
@@ -123,27 +123,22 @@ sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-### Step 3. Setting up directories for DS container and run
+### Step 3. Setting up directories for containers
 
-We will run `deepstream-l4t:6.1.1-samples` container.
+We will set up some directories to be mounted by containers.
 
 ```
 USER=username
 HOST_IP=192.168.1.101
 SCRIPT_DIR=/home/${USERNAME}/jetson-min-disk/scripts/
 
-cd
-mkdir _output
-mkdir l4t-packages
+mkdir /tmp/l4t-packages
 
-scp ${USER}@${HOST_IP}:${SCRIPT_DIR}/mod_deb/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb ./l4t-packages/
-scp ${USER}@${HOST_IP}:${SCRIPT_DIR}/mod_deb/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb ./l4t-packages/
-
-sudo docker run -it --rm --net=host --runtime nvidia -w /opt/nvidia/deepstream/deepstream \
-    -v ${PWD}/_output:/opt/nvidia/deepstream/deepstream/_output \
-    -v ${PWD}/l4t-packages:/l4t-packages \
-    nvcr.io/nvidia/deepstream-l4t:6.1.1-samples
+scp ${USER}@${HOST_IP}:${SCRIPT_DIR}/mod_deb/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb /tmp/l4t-packages/
+scp ${USER}@${HOST_IP}:${SCRIPT_DIR}/mod_deb/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb /tmp/l4t-packages/
 ```
+
+In the `l4t-packages` directory, we prepare additional/customized Debian packages to be installed inside the containers.
 
 ??? tip "How to customize the Debian package: Creation of empty package"
 
@@ -157,320 +152,387 @@ sudo docker run -it --rm --net=host --runtime nvidia -w /opt/nvidia/deepstream/d
         '
     ```
 
-### Step 4. Install additional packages inside the container
+### Step 4. Running a container
+
+=== "DeepStream"
+
+    ```
+    mkdir _output
+    sudo docker run -it --rm --net=host --runtime nvidia -w /opt/nvidia/deepstream/deepstream \
+        -v ${PWD}/_output:/opt/nvidia/deepstream/deepstream/_output \
+        -v /tmp/l4t-packages:/l4t-packages \
+        nvcr.io/nvidia/deepstream-l4t:6.1.1-samples
+    ```
+
+=== "jetnet"
+
+    ```
+    git clone https://github.com/NVIDIA-AI-IOT/jetnet
+    cd jetnet
+    sudo docker run \
+        --network host \
+        --gpus all \
+        --runtime nvidia
+        -it \
+        --rm \
+        --name=jetnet \
+        -v $(pwd):/jetnet \
+        --device /dev/video0 \
+        -v /tmp/.X11-unix:/tmp/.X11-unix \
+        -e DISPLAY=$DISPLAY \
+        -v /tmp/l4t-packages:/l4t-packages \
+        jaybdub/jetnet:l4t-35.1.0 \
+        /bin/bash -c "cd /jetnet && python3 setup.py develop && /bin/bash"
+    ```
+
+### Step 5. Install additional packages inside the container
+
+Install `nvidia-l4t` packages inside the container. <br>
+(Remember, many `nvidia-l4t` packages were removed from the base L4T, so the end application in the container may not find necessary libraries on the host.)
+
+Depending on the applications and its functionality, the required `nvidia-l4t` package vary.<br>
+It takes some trials to identify packages necessary to ensure the application's execution.
+
+Note some `nvidia-l4t` packages don't like its dependent packages (like `nvidia-l4t-core` and `nvidia-l4t-cuda`) installed on the host side.<br>
+The method demonstrated below makes the package manager think those packages are installed, although it does not actually install any files in the container.
+
+=== "DeepStream"
+
+    ```
+    mkdir -p /opt/nvidia/l4t-packages/
+    touch /opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall
+    dpkg -i /l4t-packages/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
+    dpkg -i /l4t-packages/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
+    bash -c 'echo "deb https://repo.download.nvidia.com/jetson/t234 r35.1 main" >> /etc/apt/sources.list'
+    apt-get update
+    apt-get install nvidia-l4t-multimedia
+    apt-get install nvidia-l4t-gstreamer
+    apt-get install nvidia-l4t-3d-core 
+    ldconfig
+    ```
+
+=== "jetnet"
+
+    ```
+    mkdir -p /opt/nvidia/l4t-packages/
+    touch /opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall
+    dpkg -i /l4t-packages/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
+    dpkg -i /l4t-packages/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
+    bash -c 'echo "deb https://repo.download.nvidia.com/jetson/t234 r35.1 main" >> /etc/apt/sources.list'
+    apt-get update
+    apt-get install nvidia-l4t-multimedia
+    apt-get install nvidia-l4t-3d-core 
+    ldconfig
+    ```
+
+### Step 6. Run the DeepStream sample app
 
 Run the following inside the container.
 
-```
-mkdir -p /opt/nvidia/l4t-packages/
-touch /opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall
-dpkg -i /l4t-packages/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
-dpkg -i /l4t-packages/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
-bash -c 'echo "deb https://repo.download.nvidia.com/jetson/t234 r35.1 main" >> /etc/apt/sources.list'
-apt-get update
-apt-get install nvidia-l4t-multimedia
-apt-get install nvidia-l4t-gstreamer
-apt-get install nvidia-l4t-3d-core 
-ldconfig
-```
+=== "DeepStream"
+
+    ```
+    deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
+    ```
+
+=== "jetnet"
+
+    ```
+    jetnet demo jetnet.mmdet.MASK_RCNN_R50_FPN_1X_COCO_TRT_FP16
+    ```
 
 ??? info "Log of the container"
 
-    ```
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# mkdir -p /opt/nvidia/l4t-packages/
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# touch /opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# dpkg -i /l4t-packages/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
-    Selecting previously unselected package nvidia-l4t-core.
-    (Reading database ... 41602 files and directories currently installed.)
-    Preparing to unpack .../nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb ...
-    Pre-installing... skip compatibility checking.
-    Unpacking nvidia-l4t-core (35.1.0-20220825113828) ...
-    Setting up nvidia-l4t-core (35.1.0-20220825113828) ...
+    === "DeepStream"
 
-    Configuration file '/etc/ld.so.conf.d/nvidia-tegra.conf'
-    ==> File on system created by you or by a script.
-    ==> File also in package provided by package maintainer.
-    What would you like to do about it ?  Your options are:
-        Y or I  : install the package maintainer's version
-        N or O  : keep your currently-installed version
-        D     : show the differences between the versions
-        Z     : start a shell to examine the situation
-    The default action is to keep your current version.
-    *** nvidia-tegra.conf (Y/I/N/O/D/Z) [default=N] ? N
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# dpkg -i /l4t-packages/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
-    Selecting previously unselected package nvidia-l4t-cuda.
-    (Reading database ... 41613 files and directories currently installed.)
-    Preparing to unpack .../nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb ...
-    Unpacking nvidia-l4t-cuda (35.1.0-20220825113828) ...
-    Setting up nvidia-l4t-cuda (35.1.0-20220825113828) ...
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# bash -c 'echo "deb https://repo.download.nvidia.com/jetson/t234 r35.1 main" >> /etc/apt/sources.list'
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get update
-    Get:1 https://repo.download.nvidia.com/jetson/common r35.1 InRelease [2555 B]
-    Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1 InRelease [2550 B]
-    Get:3 https://repo.download.nvidia.com/jetson/common r35.1/main arm64 Packages [19.1 kB]
-    Hit:4 http://ports.ubuntu.com/ubuntu-ports focal InRelease
-    Get:5 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
-    Get:6 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 Packages [10.3 kB]
-    Get:7 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [108 kB]
-    Get:8 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [114 kB]
-    Get:9 http://ports.ubuntu.com/ubuntu-ports focal-updates/universe arm64 Packages [1143 kB]
-    Get:10 http://ports.ubuntu.com/ubuntu-ports focal-updates/restricted arm64 Packages [4576 B]
-    Get:11 http://ports.ubuntu.com/ubuntu-ports focal-updates/main arm64 Packages [1961 kB]
-    Get:12 http://ports.ubuntu.com/ubuntu-ports focal-updates/multiverse arm64 Packages [9303 B]
-    Get:13 http://ports.ubuntu.com/ubuntu-ports focal-backports/main arm64 Packages [54.8 kB]
-    Get:14 http://ports.ubuntu.com/ubuntu-ports focal-backports/universe arm64 Packages [27.5 kB]
-    Get:15 http://ports.ubuntu.com/ubuntu-ports focal-security/restricted arm64 Packages [4331 B]
-    Get:16 http://ports.ubuntu.com/ubuntu-ports focal-security/universe arm64 Packages [845 kB]
-    Get:17 http://ports.ubuntu.com/ubuntu-ports focal-security/main arm64 Packages [1570 kB]
-    Fetched 5990 kB in 2s (2519 kB/s)
-    Reading package lists... Done
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-multimedia
-    Reading package lists... Done
-    Building dependency tree
-    Reading state information... Done
-    The following packages were automatically installed and are no longer required:
-    libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
-    Use 'apt autoremove' to remove them.
-    The following additional packages will be installed:
-    nvidia-l4t-multimedia-utils nvidia-l4t-nvsci
-    The following NEW packages will be installed:
-    nvidia-l4t-multimedia nvidia-l4t-multimedia-utils nvidia-l4t-nvsci
-    0 upgraded, 3 newly installed, 0 to remove and 67 not upgraded.
-    Need to get 8479 kB of archives.
-    After this operation, 33.7 MB of additional disk space will be used.
-    Do you want to continue? [Y/n] Y
-    Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-multimedia-utils arm64 35.1.0-20220825113828 [253 kB]
-    Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-nvsci arm64 35.1.0-20220825113828 [330 kB]
-    Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-multimedia arm64 35.1.0-20220825113828 [7896 kB]
-    Fetched 8479 kB in 1s (6809 kB/s)
-    debconf: delaying package configuration, since apt-utils is not installed
-    Selecting previously unselected package nvidia-l4t-multimedia-utils.
-    (Reading database ... 41616 files and directories currently installed.)
-    Preparing to unpack .../nvidia-l4t-multimedia-utils_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-multimedia-utils (35.1.0-20220825113828) ...
-    Selecting previously unselected package nvidia-l4t-nvsci.
-    Preparing to unpack .../nvidia-l4t-nvsci_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-nvsci (35.1.0-20220825113828) ...
-    Selecting previously unselected package nvidia-l4t-multimedia.
-    Preparing to unpack .../nvidia-l4t-multimedia_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-multimedia (35.1.0-20220825113828) ...
-    Setting up nvidia-l4t-multimedia-utils (35.1.0-20220825113828) ...
-    Setting up nvidia-l4t-nvsci (35.1.0-20220825113828) ...
-    Setting up nvidia-l4t-multimedia (35.1.0-20220825113828) ...
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-gstreamer
-    Reading package lists... Done
-    Building dependency tree
-    Reading state information... Done
-    The following packages were automatically installed and are no longer required:
-    libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
-    Use 'apt autoremove' to remove them.
-    The following additional packages will be installed:
-    libegl1-mesa nvidia-l4t-camera
-    The following NEW packages will be installed:
-    libegl1-mesa nvidia-l4t-camera nvidia-l4t-gstreamer
-    0 upgraded, 3 newly installed, 0 to remove and 67 not upgraded.
-    Need to get 6971 kB of archives.
-    After this operation, 26.7 MB of additional disk space will be used.
-    Do you want to continue? [Y/n] Y
-    Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-camera arm64 35.1.0-20220825113828 [5392 kB]
-    Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates/universe arm64 libegl1-mesa arm64 21.2.6-0ubuntu0.1~20.04.2 [6408 B]
-    Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-gstreamer arm64 35.1.0-20220825113828 [1573 kB]
-    Fetched 6971 kB in 1s (6837 kB/s)
-    debconf: delaying package configuration, since apt-utils is not installed
-    Selecting previously unselected package libegl1-mesa:arm64.
-    (Reading database ... 41701 files and directories currently installed.)
-    Preparing to unpack .../libegl1-mesa_21.2.6-0ubuntu0.1~20.04.2_arm64.deb ...
-    Unpacking libegl1-mesa:arm64 (21.2.6-0ubuntu0.1~20.04.2) ...
-    Selecting previously unselected package nvidia-l4t-camera.
-    Preparing to unpack .../nvidia-l4t-camera_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-camera (35.1.0-20220825113828) ...
-    Selecting previously unselected package nvidia-l4t-gstreamer.
-    Preparing to unpack .../nvidia-l4t-gstreamer_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-gstreamer (35.1.0-20220825113828) ...
-    Setting up libegl1-mesa:arm64 (21.2.6-0ubuntu0.1~20.04.2) ...
-    Setting up nvidia-l4t-camera (35.1.0-20220825113828) ...
-    Setting up nvidia-l4t-gstreamer (35.1.0-20220825113828) ...
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# ldconfig
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
+        ```
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# mkdir -p /opt/nvidia/l4t-packages/
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# touch /opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# dpkg -i /l4t-packages/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
+        Selecting previously unselected package nvidia-l4t-core.
+        (Reading database ... 41602 files and directories currently installed.)
+        Preparing to unpack .../nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb ...
+        Pre-installing... skip compatibility checking.
+        Unpacking nvidia-l4t-core (35.1.0-20220825113828) ...
+        Setting up nvidia-l4t-core (35.1.0-20220825113828) ...
 
-    (gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.430: Failed to load plugin '/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstchromaprint.so': libavcodec.so.58: cannot open shared object file: No such file or directory
-    No EGL Display
-    nvbufsurftransform: Could not get EGL display connection
-    nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
-    nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
-    nvbuf_utils: Could not get EGL display connection
-    nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
-    nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
-    (Argus) Error FileOperationFailed: Connecting to nvargus-daemon failed: No such file or directory (in src/rpc/socket/client/SocketClientDispatch.cpp, function openSocketConnection(), line 204)
-    (Argus) Error FileOperationFailed: Cannot create camera provider (in src/rpc/socket/client/SocketClientDispatch.cpp, function createCameraProvider(), line 106)
+        Configuration file '/etc/ld.so.conf.d/nvidia-tegra.conf'
+        ==> File on system created by you or by a script.
+        ==> File also in package provided by package maintainer.
+        What would you like to do about it ?  Your options are:
+            Y or I  : install the package maintainer's version
+            N or O  : keep your currently-installed version
+            D     : show the differences between the versions
+            Z     : start a shell to examine the situation
+        The default action is to keep your current version.
+        *** nvidia-tegra.conf (Y/I/N/O/D/Z) [default=N] ? N
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# dpkg -i /l4t-packages/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
+        Selecting previously unselected package nvidia-l4t-cuda.
+        (Reading database ... 41613 files and directories currently installed.)
+        Preparing to unpack .../nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb ...
+        Unpacking nvidia-l4t-cuda (35.1.0-20220825113828) ...
+        Setting up nvidia-l4t-cuda (35.1.0-20220825113828) ...
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# bash -c 'echo "deb https://repo.download.nvidia.com/jetson/t234 r35.1 main" >> /etc/apt/sources.list'
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get update
+        Get:1 https://repo.download.nvidia.com/jetson/common r35.1 InRelease [2555 B]
+        Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1 InRelease [2550 B]
+        Get:3 https://repo.download.nvidia.com/jetson/common r35.1/main arm64 Packages [19.1 kB]
+        Hit:4 http://ports.ubuntu.com/ubuntu-ports focal InRelease
+        Get:5 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
+        Get:6 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 Packages [10.3 kB]
+        Get:7 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [108 kB]
+        Get:8 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [114 kB]
+        Get:9 http://ports.ubuntu.com/ubuntu-ports focal-updates/universe arm64 Packages [1143 kB]
+        Get:10 http://ports.ubuntu.com/ubuntu-ports focal-updates/restricted arm64 Packages [4576 B]
+        Get:11 http://ports.ubuntu.com/ubuntu-ports focal-updates/main arm64 Packages [1961 kB]
+        Get:12 http://ports.ubuntu.com/ubuntu-ports focal-updates/multiverse arm64 Packages [9303 B]
+        Get:13 http://ports.ubuntu.com/ubuntu-ports focal-backports/main arm64 Packages [54.8 kB]
+        Get:14 http://ports.ubuntu.com/ubuntu-ports focal-backports/universe arm64 Packages [27.5 kB]
+        Get:15 http://ports.ubuntu.com/ubuntu-ports focal-security/restricted arm64 Packages [4331 B]
+        Get:16 http://ports.ubuntu.com/ubuntu-ports focal-security/universe arm64 Packages [845 kB]
+        Get:17 http://ports.ubuntu.com/ubuntu-ports focal-security/main arm64 Packages [1570 kB]
+        Fetched 5990 kB in 2s (2519 kB/s)
+        Reading package lists... Done
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-multimedia
+        Reading package lists... Done
+        Building dependency tree
+        Reading state information... Done
+        The following packages were automatically installed and are no longer required:
+        libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
+        Use 'apt autoremove' to remove them.
+        The following additional packages will be installed:
+        nvidia-l4t-multimedia-utils nvidia-l4t-nvsci
+        The following NEW packages will be installed:
+        nvidia-l4t-multimedia nvidia-l4t-multimedia-utils nvidia-l4t-nvsci
+        0 upgraded, 3 newly installed, 0 to remove and 67 not upgraded.
+        Need to get 8479 kB of archives.
+        After this operation, 33.7 MB of additional disk space will be used.
+        Do you want to continue? [Y/n] Y
+        Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-multimedia-utils arm64 35.1.0-20220825113828 [253 kB]
+        Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-nvsci arm64 35.1.0-20220825113828 [330 kB]
+        Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-multimedia arm64 35.1.0-20220825113828 [7896 kB]
+        Fetched 8479 kB in 1s (6809 kB/s)
+        debconf: delaying package configuration, since apt-utils is not installed
+        Selecting previously unselected package nvidia-l4t-multimedia-utils.
+        (Reading database ... 41616 files and directories currently installed.)
+        Preparing to unpack .../nvidia-l4t-multimedia-utils_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-multimedia-utils (35.1.0-20220825113828) ...
+        Selecting previously unselected package nvidia-l4t-nvsci.
+        Preparing to unpack .../nvidia-l4t-nvsci_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-nvsci (35.1.0-20220825113828) ...
+        Selecting previously unselected package nvidia-l4t-multimedia.
+        Preparing to unpack .../nvidia-l4t-multimedia_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-multimedia (35.1.0-20220825113828) ...
+        Setting up nvidia-l4t-multimedia-utils (35.1.0-20220825113828) ...
+        Setting up nvidia-l4t-nvsci (35.1.0-20220825113828) ...
+        Setting up nvidia-l4t-multimedia (35.1.0-20220825113828) ...
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-gstreamer
+        Reading package lists... Done
+        Building dependency tree
+        Reading state information... Done
+        The following packages were automatically installed and are no longer required:
+        libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
+        Use 'apt autoremove' to remove them.
+        The following additional packages will be installed:
+        libegl1-mesa nvidia-l4t-camera
+        The following NEW packages will be installed:
+        libegl1-mesa nvidia-l4t-camera nvidia-l4t-gstreamer
+        0 upgraded, 3 newly installed, 0 to remove and 67 not upgraded.
+        Need to get 6971 kB of archives.
+        After this operation, 26.7 MB of additional disk space will be used.
+        Do you want to continue? [Y/n] Y
+        Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-camera arm64 35.1.0-20220825113828 [5392 kB]
+        Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates/universe arm64 libegl1-mesa arm64 21.2.6-0ubuntu0.1~20.04.2 [6408 B]
+        Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-gstreamer arm64 35.1.0-20220825113828 [1573 kB]
+        Fetched 6971 kB in 1s (6837 kB/s)
+        debconf: delaying package configuration, since apt-utils is not installed
+        Selecting previously unselected package libegl1-mesa:arm64.
+        (Reading database ... 41701 files and directories currently installed.)
+        Preparing to unpack .../libegl1-mesa_21.2.6-0ubuntu0.1~20.04.2_arm64.deb ...
+        Unpacking libegl1-mesa:arm64 (21.2.6-0ubuntu0.1~20.04.2) ...
+        Selecting previously unselected package nvidia-l4t-camera.
+        Preparing to unpack .../nvidia-l4t-camera_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-camera (35.1.0-20220825113828) ...
+        Selecting previously unselected package nvidia-l4t-gstreamer.
+        Preparing to unpack .../nvidia-l4t-gstreamer_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-gstreamer (35.1.0-20220825113828) ...
+        Setting up libegl1-mesa:arm64 (21.2.6-0ubuntu0.1~20.04.2) ...
+        Setting up nvidia-l4t-camera (35.1.0-20220825113828) ...
+        Setting up nvidia-l4t-gstreamer (35.1.0-20220825113828) ...
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# ldconfig
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
 
-    (gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.722: Failed to load plugin '/usr/lib/aarch64-linux-gnu/gstreamer-1.0/deepstream/libnvdsgst_udp.so': librivermax.so.0: cannot open shared object file: No such file or directory
+        (gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.430: Failed to load plugin '/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstchromaprint.so': libavcodec.so.58: cannot open shared object file: No such file or directory
+        No EGL Display
+        nvbufsurftransform: Could not get EGL display connection
+        nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+        nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+        nvbuf_utils: Could not get EGL display connection
+        nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+        nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+        (Argus) Error FileOperationFailed: Connecting to nvargus-daemon failed: No such file or directory (in src/rpc/socket/client/SocketClientDispatch.cpp, function openSocketConnection(), line 204)
+        (Argus) Error FileOperationFailed: Cannot create camera provider (in src/rpc/socket/client/SocketClientDispatch.cpp, function createCameraProvider(), line 106)
 
-    (gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.745: Failed to load plugin '/usr/lib/aarch64-linux-gnu/gstreamer-1.0/deepstream/libnvdsgst_inferserver.so': libtritonserver.so: cannot open shared object file: No such file or directory
-    No EGL Display
-    nvbufsurftransform: Could not get EGL display connection
-    nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
-    nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
-    nvbuf_utils: Could not get EGL display connection
-    nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
-    nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
-    nvbuf_utils: Could not get EGL display connection
-    nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
-    nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
-    Opening in BLOCKING MODE
-    Opening in BLOCKING MODE
-    WARNING: Deserialize engine failed because file path: /opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine open error
-    0:00:04.369571651   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::deserializeEngineAndBackend() <nvdsinfer_context_impl.cpp:1897> [UID = 1]: deserialize engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed
-    0:00:04.515170200   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::generateBackendContext() <nvdsinfer_context_impl.cpp:2002> [UID = 1]: deserialize backend context from engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed, try rebuild
-    0:00:04.515215641   507 0xaaab19f2e430 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() <nvdsinfer_context_impl.cpp:1923> [UID = 1]: Trying to create engine from model files
-    WARNING: [TRT]: The implicit batch dimension mode has been deprecated. Please create the network with NetworkDefinitionCreationFlag::kEXPLICIT_BATCH flag whenever possible.
-    0:00:52.282508491   507 0xaaab19f2e430 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() <nvdsinfer_context_impl.cpp:1955> [UID = 1]: serialize cuda engine to file: /opt/nvidia/deepstream/deepstream-6.1/samples/models/Primary_Detector/resnet10.caffemodel_b1_gpu0_int8.engine successfully
-    INFO: [Implicit Engine Info]: layers num: 3
-    0   INPUT  kFLOAT input_1         3x368x640
-    1   OUTPUT kFLOAT conv2d_bbox     16x23x40
-    2   OUTPUT kFLOAT conv2d_cov/Sigmoid 4x23x40
+        (gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.722: Failed to load plugin '/usr/lib/aarch64-linux-gnu/gstreamer-1.0/deepstream/libnvdsgst_udp.so': librivermax.so.0: cannot open shared object file: No such file or directory
 
-    nvbufsurface: eglGetDisplay failed with error 0x300c
-    nvbufsurface: Can't get EGL display
-    0:00:52.459813791   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:943:gst_nvinfer_start:<primary_gie> error: Failed to set buffer pool to active
-    ** ERROR: <main:716>: Failed to set pipeline to PAUSED
-    Quitting
-    ERROR from primary_gie: Failed to set buffer pool to active
-    Debug info: /dvs/git/dirty/git-master_linux/deepstream/sdk/src/gst-plugins/gst-nvinfer/gstnvinfer.cpp(943): gst_nvinfer_start (): /GstPipeline:pipeline/GstBin:primary_gie_bin/GstNvInfer:primary_gie
-    App run failed
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1#
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-3d-core
-    Reading package lists... Done
-    Building dependency tree
-    Reading state information... Done
-    The following packages were automatically installed and are no longer required:
-    libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
-    Use 'apt autoremove' to remove them.
-    The following additional packages will be installed:
-    nvidia-l4t-firmware nvidia-l4t-init nvidia-l4t-libvulkan nvidia-l4t-wayland nvidia-l4t-x11
-    The following NEW packages will be installed:
-    nvidia-l4t-3d-core nvidia-l4t-firmware nvidia-l4t-init nvidia-l4t-libvulkan nvidia-l4t-wayland nvidia-l4t-x11
-    0 upgraded, 6 newly installed, 0 to remove and 67 not upgraded.
-    Need to get 67.9 MB of archives.
-    After this operation, 200 MB of additional disk space will be used.
-    Do you want to continue? [Y/n] Y
-    Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-firmware arm64 35.1.0-20220825113828 [1972 kB]
-    Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-init arm64 35.1.0-20220825113828 [91.4 kB]
-    Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-libvulkan arm64 35.1.0-20220825113828 [157 kB]
-    Get:4 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-wayland arm64 35.1.0-20220825113828 [40.4 kB]
-    Get:5 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-x11 arm64 35.1.0-20220825113828 [107 kB]
-    Get:6 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-3d-core arm64 35.1.0-20220825113828 [65.5 MB]
-    Fetched 67.9 MB in 6s (12.3 MB/s)
-    debconf: delaying package configuration, since apt-utils is not installed
-    Selecting previously unselected package nvidia-l4t-firmware.
-    (Reading database ... 41788 files and directories currently installed.)
-    Preparing to unpack .../0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-firmware (35.1.0-20220825113828) ...
-    dpkg: error processing archive /tmp/apt-dpkg-install-i4uic9/0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb (--unpack):
-    unable to create '/lib/firmware/tegra19x/nvhost_nvdec040_ns.fw.dpkg-new' (while processing './lib/firmware/tegra19x/nvhost_nvdec040_ns.fw'): Read-only file system
-    dpkg: error while cleaning up:
-    unable to remove newly-extracted version of '/lib/firmware/tegra19x/nvhost_nvdec040_ns.fw': Read-only file system
-    dpkg-deb: error: paste subprocess was killed by signal (Broken pipe)
-    Selecting previously unselected package nvidia-l4t-init.
-    Preparing to unpack .../1-nvidia-l4t-init_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-init (35.1.0-20220825113828) ...
-    Selecting previously unselected package nvidia-l4t-libvulkan.
-    Preparing to unpack .../2-nvidia-l4t-libvulkan_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-libvulkan (35.1.0-20220825113828) ...
-    Selecting previously unselected package nvidia-l4t-wayland.
-    Preparing to unpack .../3-nvidia-l4t-wayland_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-wayland (35.1.0-20220825113828) ...
-    Selecting previously unselected package nvidia-l4t-x11.
-    Preparing to unpack .../4-nvidia-l4t-x11_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-x11 (35.1.0-20220825113828) ...
-    Selecting previously unselected package nvidia-l4t-3d-core.
-    Preparing to unpack .../5-nvidia-l4t-3d-core_35.1.0-20220825113828_arm64.deb ...
-    Unpacking nvidia-l4t-3d-core (35.1.0-20220825113828) ...
-    Errors were encountered while processing:
-    /tmp/apt-dpkg-install-i4uic9/0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb
-    E: Sub-process /usr/bin/dpkg returned an error code (1)
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# ldconfig
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
-    Opening in BLOCKING MODE
-    Opening in BLOCKING MODE
-    WARNING: Deserialize engine failed because file path: /opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine open error
-    0:00:03.729908716   598 0xaaaaf78a9c30 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::deserializeEngineAndBackend() <nvdsinfer_context_impl.cpp:1897> [UID = 1]: deserialize engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed
-    0:00:03.872224256   598 0xaaaaf78a9c30 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::generateBackendContext() <nvdsinfer_context_impl.cpp:2002> [UID = 1]: deserialize backend context from engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed, try rebuild
-    0:00:03.872269088   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() <nvdsinfer_context_impl.cpp:1923> [UID = 1]: Trying to create engine from model files
-    WARNING: [TRT]: The implicit batch dimension mode has been deprecated. Please create the network with NetworkDefinitionCreationFlag::kEXPLICIT_BATCH flag whenever possible.
-    0:00:49.976836324   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() <nvdsinfer_context_impl.cpp:1955> [UID = 1]: serialize cuda engine to file: /opt/nvidia/deepstream/deepstream-6.1/samples/models/Primary_Detector/resnet10.caffemodel_b1_gpu0_int8.engine successfully
-    INFO: [Implicit Engine Info]: layers num: 3
-    0   INPUT  kFLOAT input_1         3x368x640
-    1   OUTPUT kFLOAT conv2d_bbox     16x23x40
-    2   OUTPUT kFLOAT conv2d_cov/Sigmoid 4x23x40
+        (gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.745: Failed to load plugin '/usr/lib/aarch64-linux-gnu/gstreamer-1.0/deepstream/libnvdsgst_inferserver.so': libtritonserver.so: cannot open shared object file: No such file or directory
+        No EGL Display
+        nvbufsurftransform: Could not get EGL display connection
+        nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+        nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+        nvbuf_utils: Could not get EGL display connection
+        nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+        nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+        nvbuf_utils: Could not get EGL display connection
+        nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+        nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+        Opening in BLOCKING MODE
+        Opening in BLOCKING MODE
+        WARNING: Deserialize engine failed because file path: /opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine open error
+        0:00:04.369571651   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::deserializeEngineAndBackend() <nvdsinfer_context_impl.cpp:1897> [UID = 1]: deserialize engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed
+        0:00:04.515170200   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::generateBackendContext() <nvdsinfer_context_impl.cpp:2002> [UID = 1]: deserialize backend context from engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed, try rebuild
+        0:00:04.515215641   507 0xaaab19f2e430 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() <nvdsinfer_context_impl.cpp:1923> [UID = 1]: Trying to create engine from model files
+        WARNING: [TRT]: The implicit batch dimension mode has been deprecated. Please create the network with NetworkDefinitionCreationFlag::kEXPLICIT_BATCH flag whenever possible.
+        0:00:52.282508491   507 0xaaab19f2e430 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() <nvdsinfer_context_impl.cpp:1955> [UID = 1]: serialize cuda engine to file: /opt/nvidia/deepstream/deepstream-6.1/samples/models/Primary_Detector/resnet10.caffemodel_b1_gpu0_int8.engine successfully
+        INFO: [Implicit Engine Info]: layers num: 3
+        0   INPUT  kFLOAT input_1         3x368x640
+        1   OUTPUT kFLOAT conv2d_bbox     16x23x40
+        2   OUTPUT kFLOAT conv2d_cov/Sigmoid 4x23x40
 
-    0:00:50.211166901   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer_impl.cpp:328:notifyLoadModelStatus:<primary_gie> [UID 1]: Load new model:/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/config_infer_primary.txt sucessfully
+        nvbufsurface: eglGetDisplay failed with error 0x300c
+        nvbufsurface: Can't get EGL display
+        0:00:52.459813791   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:943:gst_nvinfer_start:<primary_gie> error: Failed to set buffer pool to active
+        ** ERROR: <main:716>: Failed to set pipeline to PAUSED
+        Quitting
+        ERROR from primary_gie: Failed to set buffer pool to active
+        Debug info: /dvs/git/dirty/git-master_linux/deepstream/sdk/src/gst-plugins/gst-nvinfer/gstnvinfer.cpp(943): gst_nvinfer_start (): /GstPipeline:pipeline/GstBin:primary_gie_bin/GstNvInfer:primary_gie
+        App run failed
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1#
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-3d-core
+        Reading package lists... Done
+        Building dependency tree
+        Reading state information... Done
+        The following packages were automatically installed and are no longer required:
+        libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
+        Use 'apt autoremove' to remove them.
+        The following additional packages will be installed:
+        nvidia-l4t-firmware nvidia-l4t-init nvidia-l4t-libvulkan nvidia-l4t-wayland nvidia-l4t-x11
+        The following NEW packages will be installed:
+        nvidia-l4t-3d-core nvidia-l4t-firmware nvidia-l4t-init nvidia-l4t-libvulkan nvidia-l4t-wayland nvidia-l4t-x11
+        0 upgraded, 6 newly installed, 0 to remove and 67 not upgraded.
+        Need to get 67.9 MB of archives.
+        After this operation, 200 MB of additional disk space will be used.
+        Do you want to continue? [Y/n] Y
+        Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-firmware arm64 35.1.0-20220825113828 [1972 kB]
+        Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-init arm64 35.1.0-20220825113828 [91.4 kB]
+        Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-libvulkan arm64 35.1.0-20220825113828 [157 kB]
+        Get:4 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-wayland arm64 35.1.0-20220825113828 [40.4 kB]
+        Get:5 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-x11 arm64 35.1.0-20220825113828 [107 kB]
+        Get:6 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-3d-core arm64 35.1.0-20220825113828 [65.5 MB]
+        Fetched 67.9 MB in 6s (12.3 MB/s)
+        debconf: delaying package configuration, since apt-utils is not installed
+        Selecting previously unselected package nvidia-l4t-firmware.
+        (Reading database ... 41788 files and directories currently installed.)
+        Preparing to unpack .../0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-firmware (35.1.0-20220825113828) ...
+        dpkg: error processing archive /tmp/apt-dpkg-install-i4uic9/0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb (--unpack):
+        unable to create '/lib/firmware/tegra19x/nvhost_nvdec040_ns.fw.dpkg-new' (while processing './lib/firmware/tegra19x/nvhost_nvdec040_ns.fw'): Read-only file system
+        dpkg: error while cleaning up:
+        unable to remove newly-extracted version of '/lib/firmware/tegra19x/nvhost_nvdec040_ns.fw': Read-only file system
+        dpkg-deb: error: paste subprocess was killed by signal (Broken pipe)
+        Selecting previously unselected package nvidia-l4t-init.
+        Preparing to unpack .../1-nvidia-l4t-init_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-init (35.1.0-20220825113828) ...
+        Selecting previously unselected package nvidia-l4t-libvulkan.
+        Preparing to unpack .../2-nvidia-l4t-libvulkan_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-libvulkan (35.1.0-20220825113828) ...
+        Selecting previously unselected package nvidia-l4t-wayland.
+        Preparing to unpack .../3-nvidia-l4t-wayland_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-wayland (35.1.0-20220825113828) ...
+        Selecting previously unselected package nvidia-l4t-x11.
+        Preparing to unpack .../4-nvidia-l4t-x11_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-x11 (35.1.0-20220825113828) ...
+        Selecting previously unselected package nvidia-l4t-3d-core.
+        Preparing to unpack .../5-nvidia-l4t-3d-core_35.1.0-20220825113828_arm64.deb ...
+        Unpacking nvidia-l4t-3d-core (35.1.0-20220825113828) ...
+        Errors were encountered while processing:
+        /tmp/apt-dpkg-install-i4uic9/0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb
+        E: Sub-process /usr/bin/dpkg returned an error code (1)
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# ldconfig
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
+        Opening in BLOCKING MODE
+        Opening in BLOCKING MODE
+        WARNING: Deserialize engine failed because file path: /opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine open error
+        0:00:03.729908716   598 0xaaaaf78a9c30 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::deserializeEngineAndBackend() <nvdsinfer_context_impl.cpp:1897> [UID = 1]: deserialize engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed
+        0:00:03.872224256   598 0xaaaaf78a9c30 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::generateBackendContext() <nvdsinfer_context_impl.cpp:2002> [UID = 1]: deserialize backend context from engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed, try rebuild
+        0:00:03.872269088   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() <nvdsinfer_context_impl.cpp:1923> [UID = 1]: Trying to create engine from model files
+        WARNING: [TRT]: The implicit batch dimension mode has been deprecated. Please create the network with NetworkDefinitionCreationFlag::kEXPLICIT_BATCH flag whenever possible.
+        0:00:49.976836324   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:<primary_gie> NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() <nvdsinfer_context_impl.cpp:1955> [UID = 1]: serialize cuda engine to file: /opt/nvidia/deepstream/deepstream-6.1/samples/models/Primary_Detector/resnet10.caffemodel_b1_gpu0_int8.engine successfully
+        INFO: [Implicit Engine Info]: layers num: 3
+        0   INPUT  kFLOAT input_1         3x368x640
+        1   OUTPUT kFLOAT conv2d_bbox     16x23x40
+        2   OUTPUT kFLOAT conv2d_cov/Sigmoid 4x23x40
 
-    Runtime commands:
-            h: Print this help
-            q: Quit
+        0:00:50.211166901   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer_impl.cpp:328:notifyLoadModelStatus:<primary_gie> [UID 1]: Load new model:/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/config_infer_primary.txt sucessfully
 
-            p: Pause
-            r: Resume
+        Runtime commands:
+                h: Print this help
+                q: Quit
+
+                p: Pause
+                r: Resume
 
 
-    **PERF:  FPS 0 (Avg)    FPS 1 (Avg)
-    **PERF:  0.00 (0.00)    0.00 (0.00)
-    ** INFO: <bus_callback:194>: Pipeline ready
+        **PERF:  FPS 0 (Avg)    FPS 1 (Avg)
+        **PERF:  0.00 (0.00)    0.00 (0.00)
+        ** INFO: <bus_callback:194>: Pipeline ready
 
-    WARNING from src_elem: No decoder available for type 'audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)119056e500, rate=(int)48000, channels=(int)2'.
-    Debug info: gsturidecodebin.c(920): unknown_type_cb (): /GstPipeline:pipeline/GstBin:multi_src_bin/GstBin:src_sub_bin0/GstURIDecodeBin:src_elem
-    WARNING from src_elem: No decoder available for type 'audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)119056e500, rate=(int)48000, channels=(int)2'.
-    Debug info: gsturidecodebin.c(920): unknown_type_cb (): /GstPipeline:pipeline/GstBin:multi_src_bin/GstBin:src_sub_bin1/GstURIDecodeBin:src_elem
-    Opening in BLOCKING MODE
-    Opening in BLOCKING MODE
-    NvMMLiteOpen : Block : BlockType = 261
-    NvMMLiteOpen : Block : BlockType = 261
-    NVMEDIA: Reading vendor.tegra.display-size : status: 6
-    NVMEDIA: Reading vendor.tegra.display-size : status: 6
-    NvMMLiteBlockCreate : Block : BlockType = 261
-    NvMMLiteBlockCreate : Block : BlockType = 261
-    ** INFO: <bus_callback:180>: Pipeline running
+        WARNING from src_elem: No decoder available for type 'audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)119056e500, rate=(int)48000, channels=(int)2'.
+        Debug info: gsturidecodebin.c(920): unknown_type_cb (): /GstPipeline:pipeline/GstBin:multi_src_bin/GstBin:src_sub_bin0/GstURIDecodeBin:src_elem
+        WARNING from src_elem: No decoder available for type 'audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)119056e500, rate=(int)48000, channels=(int)2'.
+        Debug info: gsturidecodebin.c(920): unknown_type_cb (): /GstPipeline:pipeline/GstBin:multi_src_bin/GstBin:src_sub_bin1/GstURIDecodeBin:src_elem
+        Opening in BLOCKING MODE
+        Opening in BLOCKING MODE
+        NvMMLiteOpen : Block : BlockType = 261
+        NvMMLiteOpen : Block : BlockType = 261
+        NVMEDIA: Reading vendor.tegra.display-size : status: 6
+        NVMEDIA: Reading vendor.tegra.display-size : status: 6
+        NvMMLiteBlockCreate : Block : BlockType = 261
+        NvMMLiteBlockCreate : Block : BlockType = 261
+        ** INFO: <bus_callback:180>: Pipeline running
 
-    NvMMLiteOpen : Block : BlockType = 4
-    NvMMLiteOpen : Block : BlockType = 4
-    ===== NVMEDIA: NVENC =====
-    ===== NVMEDIA: NVENC =====
-    NvMMLiteBlockCreate : Block : BlockType = 4
-    NvMMLiteBlockCreate : Block : BlockType = 4
-    H264: Profile = 66, Level = 0
-    NVMEDIA: Need to set EMC bandwidth : 846000
-    NVMEDIA_ENC: bBlitMode is set to TRUE
-    H264: Profile = 66, Level = 0
-    NVMEDIA: Need to set EMC bandwidth : 846000
-    NVMEDIA_ENC: bBlitMode is set to TRUE
-    **PERF:  33.49 (33.33)  33.59 (33.37)
-    **PERF:  30.02 (31.53)  30.01 (31.55)
-    **PERF:  29.92 (31.02)  29.97 (31.03)
-    **PERF:  29.98 (30.76)  30.00 (30.77)
-    **PERF:  29.90 (30.61)  29.83 (30.61)
-    **PERF:  29.84 (30.50)  29.83 (30.51)
-    **PERF:  30.39 (30.46)  30.40 (30.47)
-    **PERF:  29.61 (30.35)  29.78 (30.41)
-    **PERF:  29.99 (30.34)  30.00 (30.36)
-    ** INFO: <bus_callback:217>: Received EOS. Exiting ...
+        NvMMLiteOpen : Block : BlockType = 4
+        NvMMLiteOpen : Block : BlockType = 4
+        ===== NVMEDIA: NVENC =====
+        ===== NVMEDIA: NVENC =====
+        NvMMLiteBlockCreate : Block : BlockType = 4
+        NvMMLiteBlockCreate : Block : BlockType = 4
+        H264: Profile = 66, Level = 0
+        NVMEDIA: Need to set EMC bandwidth : 846000
+        NVMEDIA_ENC: bBlitMode is set to TRUE
+        H264: Profile = 66, Level = 0
+        NVMEDIA: Need to set EMC bandwidth : 846000
+        NVMEDIA_ENC: bBlitMode is set to TRUE
+        **PERF:  33.49 (33.33)  33.59 (33.37)
+        **PERF:  30.02 (31.53)  30.01 (31.55)
+        **PERF:  29.92 (31.02)  29.97 (31.03)
+        **PERF:  29.98 (30.76)  30.00 (30.77)
+        **PERF:  29.90 (30.61)  29.83 (30.61)
+        **PERF:  29.84 (30.50)  29.83 (30.51)
+        **PERF:  30.39 (30.46)  30.40 (30.47)
+        **PERF:  29.61 (30.35)  29.78 (30.41)
+        **PERF:  29.99 (30.34)  30.00 (30.36)
+        ** INFO: <bus_callback:217>: Received EOS. Exiting ...
 
-    Quitting
-    App run successful
-    root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# 
-    ```
+        Quitting
+        App run successful
+        root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# 
+        ```
 
-### Step 5. Run the DeepStream sample app
-
-Run the following inside the container.
-
-```
-deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
-```
 
 ### Troubleshooting
 
-When DeepStream shows an error related to GStreamer, you may need to perform the following. 
+When DeepStream app shows an error related to GStreamer, you may need to perform the following. 
 
 ```
 rm ~/.cache/gstreamer-1.0/registry.aarch64.bin 
