@@ -538,13 +538,15 @@ When DeepStream app shows an error related to GStreamer, you may need to perform
 rm ~/.cache/gstreamer-1.0/registry.aarch64.bin 
 ```
 
-## Profiling
+## Resulting 4T configuration
 
 ### `bone300` + `k8`
 
 ??? example "Installed package list"
 
     ```
+    Filesystem      Size  Used Avail Use% Mounted on
+    /dev/mmcblk0p1   54G  682M   51G   2% /
         624 KiB 	adduser                       	add and remove users and groups
        4007 KiB 	apt                           	commandline package manager
         387 KiB 	base-files                    	Debian base system miscellaneous files
