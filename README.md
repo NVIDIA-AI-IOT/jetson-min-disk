@@ -1,6 +1,6 @@
 # jetson-min-disk
 
-Document generation status: ![example workflow](https://github.com/NVIDIA-AI-IOT/jetson-min-disk/actions/workflows/ci.yml/badge.svg)
+Document generation status: [![example workflow](https://github.com/NVIDIA-AI-IOT/jetson-min-disk/actions/workflows/pages-build-deployment.yml/badge.svg)](https://github.com/NVIDIA-AI-IOT/jetson-min-disk/actions)
 
 This repo is to host the online guide for minimizing Jetson disk usage, and to host the associated scripts and assets.
 
