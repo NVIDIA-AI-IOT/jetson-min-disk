@@ -130,7 +130,9 @@ libgssapi-krb5-2
 libgssapi3-heimdal
 libgts-0.7-5
 libgts-bin
-libgudev-1.0-0libgvc6libgvpr2
+libgudev-1.0-0
+libgvc6
+libgvpr2
 libhcrypto4-heimdal
 libheimbase1-heimdal
 libheimntlm0-heimdal
