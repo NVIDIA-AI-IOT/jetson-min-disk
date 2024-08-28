@@ -1,0 +1,2020 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+      
+        <link rel="prev" href="jp5_container-only.html">
+      
+      
+        <link rel="next" href="jp5_verification.html">
+      
+      
+      <link rel="icon" href="images/jetson-min-disk_favicon.png">
+      <meta name="generator" content="mkdocs-1.6.0, mkdocs-material-9.5.33">
+    
+    
+      
+        <title>Minimized L4T - Guide to Minimizing Jetson Disk Usage</title>
+      
+    
+    
+      <link rel="stylesheet" href="assets/stylesheets/main.3cba04c6.min.css">
+      
+        
+        <link rel="stylesheet" href="assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Incosolata:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Incosolata";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="css/colors.css">
+    
+    <script>__md_scope=new URL(".",location),__md_hash=e=>[...e].reduce((e,_)=>(e<<5)-e+_.charCodeAt(0),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+  
+
+
+  
+  
+
+<script id="__analytics">function __md_analytics(){function n(){dataLayer.push(arguments)}window.dataLayer=window.dataLayer||[],n("js",new Date),n("config","G-WB29HFW2FX"),document.addEventListener("DOMContentLoaded",function(){document.forms.search&&document.forms.search.query.addEventListener("blur",function(){this.value&&n("event","search",{search_term:this.value})}),document$.subscribe(function(){var a=document.forms.feedback;if(void 0!==a)for(var e of a.querySelectorAll("[type=submit]"))e.addEventListener("click",function(e){e.preventDefault();var t=document.location.pathname,e=this.getAttribute("data-md-value");n("event","feedback",{page:t,data:e}),a.firstElementChild.disabled=!0;e=a.querySelector(".md-feedback__note [data-md-value='"+e+"']");e&&(e.hidden=!1)}),a.hidden=!1}),location$.subscribe(function(e){n("config","G-WB29HFW2FX",{page_path:e.pathname})})});var e=document.createElement("script");e.async=!0,e.src="https://www.googletagmanager.com/gtag/js?id=G-WB29HFW2FX",document.getElementById("__analytics").insertAdjacentElement("afterEnd",e)}</script>
+  
+    <script>"undefined"!=typeof __md_analytics&&__md_analytics()</script>
+  
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="nvgreen" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#minimized-l4t-configuration-for-jetpack-5x" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="index.html" title="Guide to Minimizing Jetson Disk Usage" class="md-header__button md-logo" aria-label="Guide to Minimizing Jetson Disk Usage" data-md-component="logo">
+      
+  <img src="images/jetson-min-disk_logo-white.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2Z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            Guide to Minimizing Jetson Disk Usage
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Minimized L4T
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="nvgreen" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 6H7c-3.31 0-6 2.69-6 6s2.69 6 6 6h10c3.31 0 6-2.69 6-6s-2.69-6-6-6zm0 10H7c-2.21 0-4-1.79-4-4s1.79-4 4-4h10c2.21 0 4 1.79 4 4s-1.79 4-4 4zM7 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M17 7H7a5 5 0 0 0-5 5 5 5 0 0 0 5 5h10a5 5 0 0 0 5-5 5 5 0 0 0-5-5m0 8a3 3 0 0 1-3-3 3 3 0 0 1 3-3 3 3 0 0 1 3 3 3 3 0 0 1-3 3Z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var media,input,key,value,palette=__md_get("__palette");if(palette&&palette.color){"(prefers-color-scheme)"===palette.color.media&&(media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']"),palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent"));for([key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.516 6.516 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5Z"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11h12Z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12 19 6.41Z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="index.html" title="Guide to Minimizing Jetson Disk Usage" class="md-nav__button md-logo" aria-label="Guide to Minimizing Jetson Disk Usage" data-md-component="logo">
+      
+  <img src="images/jetson-min-disk_logo-white.png" alt="logo">
+
+    </a>
+    Guide to Minimizing Jetson Disk Usage
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81z"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="index.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="intro.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Introduction
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="analysis.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Analyze Disk Usage
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    For JetPack 5.x
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            For JetPack 5.x
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="jp5_jetpack-runtime.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    JetPack Runtime
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="jp5_container-only.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    nvidia-container only
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Minimized L4T
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="jp5_minimal-l4t.html" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Minimized L4T
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#l4t-composition" class="md-nav__link">
+    <span class="md-ellipsis">
+      L4T composition
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="L4T composition">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#standard-debian-packages-for-rootfs-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      Standard Debian packages for RootFS image
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nvidia-l4t-specific-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      nvidia-l4t specific packages
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#instruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instruction
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Instruction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-prepare-a-minimized-flavor-l4t" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1. Prepare a minimized flavor L4T
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-install-nvidia-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2. Install nvidia-container
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-setting-up-directories-for-containers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3. Setting up directories for containers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-running-a-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4. Running a container
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-install-additional-packages-inside-the-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5. Install additional packages inside the container
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-run-the-deepstream-sample-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 6. Run the DeepStream sample app
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resulting-4t-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resulting 4T configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resulting 4T configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bone300-k8" class="md-nav__link">
+    <span class="md-ellipsis">
+      bone300 + k8
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="jp5_verification.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Verification
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+      
+        
+      
+        
+      
+        
+      
+        
+      
+        
+      
+    
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+          
+        
+        <input class="md-nav__toggle md-toggle md-toggle--indeterminate" type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  <span class="md-ellipsis">
+    For JetPack 4.x (and 5.x)
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            For JetPack 4.x (and 5.x)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="overview_minimizing_steps.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview of Minimizing Steps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="step1.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 1: Removing GUI
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="step2.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 2: Removing docs/sample
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="step3.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Step 3: Removing dev packages
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="verification.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Verification
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="minimal-l4t.html" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Option: Minimal L4T
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="references.md" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    References
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#l4t-composition" class="md-nav__link">
+    <span class="md-ellipsis">
+      L4T composition
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="L4T composition">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#standard-debian-packages-for-rootfs-image" class="md-nav__link">
+    <span class="md-ellipsis">
+      Standard Debian packages for RootFS image
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#nvidia-l4t-specific-packages" class="md-nav__link">
+    <span class="md-ellipsis">
+      nvidia-l4t specific packages
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#instruction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instruction
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Instruction">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#step-1-prepare-a-minimized-flavor-l4t" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1. Prepare a minimized flavor L4T
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-2-install-nvidia-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2. Install nvidia-container
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-3-setting-up-directories-for-containers" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3. Setting up directories for containers
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-4-running-a-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4. Running a container
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-5-install-additional-packages-inside-the-container" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 5. Install additional packages inside the container
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#step-6-run-the-deepstream-sample-app" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 6. Run the DeepStream sample app
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#resulting-4t-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Resulting 4T configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Resulting 4T configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#bone300-k8" class="md-nav__link">
+    <span class="md-ellipsis">
+      bone300 + k8
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="minimized-l4t-configuration-for-jetpack-5x">"Minimized L4T" configuration for JetPack 5.x</h1>
+<p>You can create a minimized configuration of L4T by reducing the standard Debian packages that composes the base RootFS image or/and by reducing the <code>nvidia-l4t</code> specific packages installed on top of the RootFS image to foam L4T. <br>
+You may need to installed some of the removed <code>nvidia-l4t</code> packages on the container side.</p>
+<div class="admonition example">
+<p class="admonition-title">Disk space used for JetPack Runtime configuration</p>
+<table>
+<thead>
+<tr>
+<th><img width=240/></th>
+<th style="text-align: right;">JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson AGX Orin<br>Developer Kit</th>
+<th style="text-align: right;">JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson AGX Xavier<br>Developer Kit</th>
+<th style="text-align: right;">JetPack 5.0.2<br>(Rel 35.1.0)<br>Jetson Xavier NX<br>Developer Kit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><em>Base L4T</em></td>
+<td style="text-align: right;">5.6 GB</td>
+<td style="text-align: right;">nnn GB</td>
+<td style="text-align: right;">5.6 GB</td>
+</tr>
+<tr>
+<td><strong><em>minplus</em></strong> flavor L4T</td>
+<td style="text-align: right;"><mark class="critic">2.7 GB</mark></td>
+<td style="text-align: right;"><mark class="critic">nnn GB</mark></td>
+<td style="text-align: right;"><mark class="critic">2.6 GB</mark></td>
+</tr>
+<tr>
+<td><strong><em>bone300</em></strong> flavor L4T</td>
+<td style="text-align: right;"><mark class="critic">682 MB</mark></td>
+<td style="text-align: right;"><mark class="critic">nnn GB</mark></td>
+<td style="text-align: right;"><mark class="critic">670 GB</mark></td>
+</tr>
+</tbody>
+</table>
+</div>
+<h2 id="l4t-composition">L4T composition</h2>
+<h3 id="standard-debian-packages-for-rootfs-image">Standard Debian packages for RootFS image</h3>
+<p><img alt="" src="images/l4t_bsp_rootfs.png" /></p>
+<div class="admonition info">
+<p class="admonition-title">Link to the RootFS flavor definition</p>
+<ul>
+<li><a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/rfs_flavors/nvubuntu-focal-desktop-aarch64-packages"><code>nvubuntu-focal-desktop-aarch64-packages</code></a></li>
+<li><a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/rfs_flavors/nvubuntu-focal-minimal-aarch64-packages"><code>nvubuntu-focal-minimal-aarch64-packages</code></a></li>
+<li><a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/rfs_flavors/nvubuntu-focal-bone300-aarch64-packages"><code>nvubuntu-focal-bone300-aarch64-packages</code></a></li>
+</ul>
+</div>
+<h3 id="nvidia-l4t-specific-packages"><code>nvidia-l4t</code> specific packages</h3>
+<p><img alt="" src="images/l4t_nvidia-l4t-packages.png" /></p>
+<div class="admonition note">
+<p class="admonition-title">Full list of nvidia-l4t packages</p>
+<div class="highlight"><pre><span></span><code> 160854 KiB     nvidia-l4t-3d-core              NVIDIA GL EGL Package
+     31 KiB     nvidia-l4t-apt-source           NVIDIA L4T apt source list debian package
+ 198666 KiB     nvidia-l4t-bootloader           NVIDIA Bootloader Package
+  20839 KiB     nvidia-l4t-camera               NVIDIA Camera Package
+   1504 KiB     nvidia-l4t-configs              NVIDIA configs debian package
+  10422 KiB     nvidia-l4t-core                 NVIDIA Core Package
+  22790 KiB     nvidia-l4t-cuda                 NVIDIA CUDA Package
+   4094 KiB     nvidia-l4t-display-kernel       NVIDIA Display Kernel Modules Package
+  16487 KiB     nvidia-l4t-firmware             NVIDIA Firmware Package
+     77 KiB     nvidia-l4t-gbm                  NVIDIA GBM Package
+     38 KiB     nvidia-l4t-gputools             NVIDIA dgpu helper Package
+  69598 KiB     nvidia-l4t-graphics-demos       NVIDIA graphics demo applications
+   5131 KiB     nvidia-l4t-gstreamer            NVIDIA GST Application files
+  16737 KiB     nvidia-l4t-init                 NVIDIA Init debian package
+  16421 KiB     nvidia-l4t-initrd               NVIDIA initrd debian package
+    134 KiB     nvidia-l4t-jetson-io            NVIDIA Jetson.IO debian package
+    159 KiB     nvidia-l4t-jetsonpower-gui-too  NVIDIA Jetson Power GUI Tools debian package
+ 237542 KiB     nvidia-l4t-kernel               NVIDIA Kernel Package
+   4772 KiB     nvidia-l4t-kernel-dtbs          NVIDIA Kernel DTB Package
+  70953 KiB     nvidia-l4t-kernel-headers       NVIDIA Linux Tegra Kernel Headers Package
+    596 KiB     nvidia-l4t-libvulkan            NVIDIA Vulkan Loader Package
+  31183 KiB     nvidia-l4t-multimedia           NVIDIA Multimedia Package
+    742 KiB     nvidia-l4t-multimedia-utils     NVIDIA Multimedia Package
+     65 KiB     nvidia-l4t-nvfancontrol         NVIDIA Nvfancontrol debian package
+    205 KiB     nvidia-l4t-nvpmodel             NVIDIA Nvpmodel debian package
+     86 KiB     nvidia-l4t-nvpmodel-gui-tools   NVIDIA Nvpmodel GUI Tools debian package
+    999 KiB     nvidia-l4t-nvsci                NVIDIA NvSci Package
+    110 KiB     nvidia-l4t-oem-config           NVIDIA OEM-Config Package
+    235 KiB     nvidia-l4t-openwfd              NVIDIA OpenWFD Package
+   8212 KiB     nvidia-l4t-optee                OP-TEE userspace daemons, test programs and libraries
+     85 KiB     nvidia-l4t-pva                  NVIDIA PVA Package
+   3336 KiB     nvidia-l4t-tools                NVIDIA Public Test Tools Package
+   6922 KiB     nvidia-l4t-vulkan-sc            NVIDIA Vulkan SC run-time package
+  19617 KiB     nvidia-l4t-vulkan-sc-dev        NVIDIA Vulkan SC Dev package
+  14000 KiB     nvidia-l4t-vulkan-sc-samples    NVIDIA Vulkan SC samples package
+  83151 KiB     nvidia-l4t-vulkan-sc-sdk        NVIDIA Vulkan SC SDK package
+     77 KiB     nvidia-l4t-wayland              NVIDIA Wayland Package
+   4749 KiB     nvidia-l4t-weston               NVIDIA Weston Package
+    226 KiB     nvidia-l4t-x11                  NVIDIA X11 Package
+    602 KiB     nvidia-l4t-xusb-firmware        NVIDIA USB Firmware Package
+
+     52 KiB     jetson-gpio-common              Jetson GPIO library package (common files)
+    105 KiB     python-jetson-gpio              Jetson GPIO library package (Python 2)
+    105 KiB     python3-jetson-gpio             Jetson GPIO library package (Python 3)
+</code></pre></div>
+</div>
+<div class="admonition info">
+<p class="admonition-title">Link to the L4T Package Lists</p>
+<ul>
+<li><a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/l4t_pkg_lists/l4t_all.list"><code>l4t_all.list</code></a></li>
+<li><a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/l4t_pkg_lists/l4t_k8.list"><code>l4t_k8.list</code></a></li>
+<li><a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/l4t_pkg_lists/l4t_k10.list"><code>l4t_k10.list</code></a></li>
+</ul>
+</div>
+<h2 id="instruction">Instruction</h2>
+<p>Below, we show how you set up the <code>Linux_for_Tegra</code> directory for <strong>Jetson AGX Orin</strong> based on <code>r35.1.0</code> with:</p>
+<ul>
+<li>300 Debian packages for BSP rootfs (<a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/rfs_flavors/nvubuntu-focal-bone300-aarch64-packages"><code>nvubuntu-focal-bone300-aarch64-packages</code></a>)</li>
+<li>kernel + 8 packages for <code>nvidia-l4t</code> packages (<a href="https://github.com/NVIDIA-AI-IOT/jetson-min-disk/blob/main/l4t_pkg_lists/l4t_k8.list"><code>l4t_k8.list</code></a>)</li>
+</ul>
+<h3 id="step-1-prepare-a-minimized-flavor-l4t">Step 1. Prepare a minimized flavor L4T</h3>
+<p>Use a L4T utility script to prepare the customized <code>Linux_for_Tegra</code> directory.</p>
+<div class="admonition note">
+<div class="tabbed-set tabbed-alternate" data-tabs="1:1"><input checked="checked" id="__tabbed_1_1" name="__tabbed_1" type="radio" /><div class="tabbed-labels"><label for="__tabbed_1_1"><span class="twemoji"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13.8 22H5c-1.7 0-3-1.3-3-3v-1h11.1c-.1.3-.1.7-.1 1 0 1.1.3 2.1.8 3m0-6H5V5c0-1.7 1.3-3 3-3h11c1.7 0 3 1.3 3 3v1h-2V5c0-.6-.4-1-1-1s-1 .4-1 1v8.1c-1.8.3-3.3 1.4-4.2 2.9M8 8h7V6H8v2m0 4h6v-2H8v2m9 4v6l5-3-5-3Z"/></svg></span>Using <code>prepare_l4t_dir.sh</code> script</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<p>You can use <code>prepare_l4t_dir.sh</code> script to automate the preparation of <code>Linux_for_Tegra</code> directory.</p>
+<div class="highlight"><pre><span></span><code>BOARD=jetson-agx-orin-devkit
+
+cd
+git clone https://github.com/NVIDIA-AI-IOT/jetson-min-disk
+cd jetson-min-disk
+./scripts/prepare_l4t_dir.sh -b ${BOARD} -v r35.1.0 --flavor bone300 --l4tpkg k8
+cd $(cat LAST_L4T_DIR)
+sudo ./flash.sh ${BOARD} mmcblk0p1
+</code></pre></div>
+</div>
+</div>
+</div>
+</div>
+<h3 id="step-2-install-nvidia-container">Step 2. Install <code>nvidia-container</code></h3>
+<p>After flashing is done, boot your Jetson, and execute the following.</p>
+<div class="highlight"><pre><span></span><code>sudo apt update
+sudo apt install nvidia-container
+sudo systemctl restart docker
+sudo usermod -aG docker $USER
+newgrp docker
+</code></pre></div>
+<h3 id="step-3-setting-up-directories-for-containers">Step 3. Setting up directories for containers</h3>
+<p>We will set up some directories to be mounted by containers.</p>
+<div class="highlight"><pre><span></span><code>USER=username
+HOST_IP=192.168.1.101
+SCRIPT_DIR=/home/${USERNAME}/jetson-min-disk/scripts/
+
+mkdir /tmp/l4t-packages
+
+scp ${USER}@${HOST_IP}:${SCRIPT_DIR}/mod_deb/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb /tmp/l4t-packages/
+scp ${USER}@${HOST_IP}:${SCRIPT_DIR}/mod_deb/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb /tmp/l4t-packages/
+</code></pre></div>
+<p>In the <code>l4t-packages</code> directory, we prepare additional/customized Debian packages to be installed inside the containers.</p>
+<details class="tip">
+<summary>How to customize the Debian package: Creation of empty package</summary>
+<div class="highlight"><pre><span></span><code>fakeroot sh -c &#39;
+    mkdir tmp
+    dpkg-deb -R nvidia-l4t-cuda_35.1.0-20220825113828_arm64.deb tmp
+    rm -rf ./tmp/usr
+    dpkg-deb -b tmp nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
+    rm -rf ./tmp
+    &#39;
+</code></pre></div>
+</details>
+<h3 id="step-4-running-a-container">Step 4. Running a container</h3>
+<div class="tabbed-set tabbed-alternate" data-tabs="2:2"><input checked="checked" id="__tabbed_2_1" name="__tabbed_2" type="radio" /><input id="__tabbed_2_2" name="__tabbed_2" type="radio" /><div class="tabbed-labels"><label for="__tabbed_2_1">DeepStream</label><label for="__tabbed_2_2">jetnet</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>mkdir _output
+sudo docker run -it --rm --net=host --runtime nvidia -w /opt/nvidia/deepstream/deepstream \
+    -v ${PWD}/_output:/opt/nvidia/deepstream/deepstream/_output \
+    -v /tmp/l4t-packages:/l4t-packages \
+    nvcr.io/nvidia/deepstream-l4t:6.1.1-samples
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>git clone https://github.com/NVIDIA-AI-IOT/jetnet
+cd jetnet
+sudo docker run \
+    --network host \
+    --gpus all \
+    --runtime nvidia
+    -it \
+    --rm \
+    --name=jetnet \
+    -v $(pwd):/jetnet \
+    --device /dev/video0 \
+    -v /tmp/.X11-unix:/tmp/.X11-unix \
+    -e DISPLAY=$DISPLAY \
+    -v /tmp/l4t-packages:/l4t-packages \
+    jaybdub/jetnet:l4t-35.1.0 \
+    /bin/bash -c &quot;cd /jetnet &amp;&amp; python3 setup.py develop &amp;&amp; /bin/bash&quot;
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="step-5-install-additional-packages-inside-the-container">Step 5. Install additional packages inside the container</h3>
+<p>Install <code>nvidia-l4t</code> packages inside the container. <br>
+(Remember, many <code>nvidia-l4t</code> packages were removed from the base L4T, so the end application in the container may not find necessary libraries on the host.)</p>
+<p>Depending on the applications and its functionality, the required <code>nvidia-l4t</code> package vary.<br>
+It takes some trials to identify packages necessary to ensure the application's execution.</p>
+<p>Note some <code>nvidia-l4t</code> packages don't like its dependent packages (like <code>nvidia-l4t-core</code> and <code>nvidia-l4t-cuda</code>) installed on the host side.<br>
+The method demonstrated below makes the package manager think those packages are installed, although it does not actually install any files in the container.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="3:2"><input checked="checked" id="__tabbed_3_1" name="__tabbed_3" type="radio" /><input id="__tabbed_3_2" name="__tabbed_3" type="radio" /><div class="tabbed-labels"><label for="__tabbed_3_1">DeepStream</label><label for="__tabbed_3_2">jetnet</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>mkdir -p /opt/nvidia/l4t-packages/
+touch /opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall
+dpkg -i /l4t-packages/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
+dpkg -i /l4t-packages/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
+bash -c &#39;echo &quot;deb https://repo.download.nvidia.com/jetson/t234 r35.1 main&quot; &gt;&gt; /etc/apt/sources.list&#39;
+apt-get update
+apt-get install nvidia-l4t-multimedia
+apt-get install nvidia-l4t-gstreamer
+apt-get install nvidia-l4t-3d-core 
+ldconfig
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>mkdir -p /opt/nvidia/l4t-packages/
+touch /opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall
+dpkg -i /l4t-packages/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
+dpkg -i /l4t-packages/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
+bash -c &#39;echo &quot;deb https://repo.download.nvidia.com/jetson/t234 r35.1 main&quot; &gt;&gt; /etc/apt/sources.list&#39;
+apt-get update
+apt-get install nvidia-l4t-multimedia
+apt-get install nvidia-l4t-3d-core 
+ldconfig
+</code></pre></div>
+</div>
+</div>
+</div>
+<h3 id="step-6-run-the-deepstream-sample-app">Step 6. Run the DeepStream sample app</h3>
+<p>Run the following inside the container.</p>
+<div class="tabbed-set tabbed-alternate" data-tabs="4:2"><input checked="checked" id="__tabbed_4_1" name="__tabbed_4" type="radio" /><input id="__tabbed_4_2" name="__tabbed_4" type="radio" /><div class="tabbed-labels"><label for="__tabbed_4_1">DeepStream</label><label for="__tabbed_4_2">jetnet</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
+</code></pre></div>
+</div>
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>jetnet demo jetnet.mmdet.MASK_RCNN_R50_FPN_1X_COCO_TRT_FP16
+</code></pre></div>
+</div>
+</div>
+</div>
+<details class="info">
+<summary>Log of the container</summary>
+<div class="tabbed-set tabbed-alternate" data-tabs="5:1"><input checked="checked" id="__tabbed_5_1" name="__tabbed_5" type="radio" /><div class="tabbed-labels"><label for="__tabbed_5_1">DeepStream</label></div>
+<div class="tabbed-content">
+<div class="tabbed-block">
+<div class="highlight"><pre><span></span><code>root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# mkdir -p /opt/nvidia/l4t-packages/
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# touch /opt/nvidia/l4t-packages/.nv-l4t-disable-boot-fw-update-in-preinstall
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# dpkg -i /l4t-packages/nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb
+Selecting previously unselected package nvidia-l4t-core.
+(Reading database ... 41602 files and directories currently installed.)
+Preparing to unpack .../nvidia-l4t-core_35.1.0-20220825113828nolib_arm64.deb ...
+Pre-installing... skip compatibility checking.
+Unpacking nvidia-l4t-core (35.1.0-20220825113828) ...
+Setting up nvidia-l4t-core (35.1.0-20220825113828) ...
+
+Configuration file &#39;/etc/ld.so.conf.d/nvidia-tegra.conf&#39;
+==&gt; File on system created by you or by a script.
+==&gt; File also in package provided by package maintainer.
+What would you like to do about it ?  Your options are:
+    Y or I  : install the package maintainer&#39;s version
+    N or O  : keep your currently-installed version
+    D     : show the differences between the versions
+    Z     : start a shell to examine the situation
+The default action is to keep your current version.
+*** nvidia-tegra.conf (Y/I/N/O/D/Z) [default=N] ? N
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# dpkg -i /l4t-packages/nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb
+Selecting previously unselected package nvidia-l4t-cuda.
+(Reading database ... 41613 files and directories currently installed.)
+Preparing to unpack .../nvidia-l4t-cuda_35.1.0-20220825113828nolib_arm64.deb ...
+Unpacking nvidia-l4t-cuda (35.1.0-20220825113828) ...
+Setting up nvidia-l4t-cuda (35.1.0-20220825113828) ...
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# bash -c &#39;echo &quot;deb https://repo.download.nvidia.com/jetson/t234 r35.1 main&quot; &gt;&gt; /etc/apt/sources.list&#39;
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get update
+Get:1 https://repo.download.nvidia.com/jetson/common r35.1 InRelease [2555 B]
+Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1 InRelease [2550 B]
+Get:3 https://repo.download.nvidia.com/jetson/common r35.1/main arm64 Packages [19.1 kB]
+Hit:4 http://ports.ubuntu.com/ubuntu-ports focal InRelease
+Get:5 http://ports.ubuntu.com/ubuntu-ports focal-updates InRelease [114 kB]
+Get:6 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 Packages [10.3 kB]
+Get:7 http://ports.ubuntu.com/ubuntu-ports focal-backports InRelease [108 kB]
+Get:8 http://ports.ubuntu.com/ubuntu-ports focal-security InRelease [114 kB]
+Get:9 http://ports.ubuntu.com/ubuntu-ports focal-updates/universe arm64 Packages [1143 kB]
+Get:10 http://ports.ubuntu.com/ubuntu-ports focal-updates/restricted arm64 Packages [4576 B]
+Get:11 http://ports.ubuntu.com/ubuntu-ports focal-updates/main arm64 Packages [1961 kB]
+Get:12 http://ports.ubuntu.com/ubuntu-ports focal-updates/multiverse arm64 Packages [9303 B]
+Get:13 http://ports.ubuntu.com/ubuntu-ports focal-backports/main arm64 Packages [54.8 kB]
+Get:14 http://ports.ubuntu.com/ubuntu-ports focal-backports/universe arm64 Packages [27.5 kB]
+Get:15 http://ports.ubuntu.com/ubuntu-ports focal-security/restricted arm64 Packages [4331 B]
+Get:16 http://ports.ubuntu.com/ubuntu-ports focal-security/universe arm64 Packages [845 kB]
+Get:17 http://ports.ubuntu.com/ubuntu-ports focal-security/main arm64 Packages [1570 kB]
+Fetched 5990 kB in 2s (2519 kB/s)
+Reading package lists... Done
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-multimedia
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
+Use &#39;apt autoremove&#39; to remove them.
+The following additional packages will be installed:
+nvidia-l4t-multimedia-utils nvidia-l4t-nvsci
+The following NEW packages will be installed:
+nvidia-l4t-multimedia nvidia-l4t-multimedia-utils nvidia-l4t-nvsci
+0 upgraded, 3 newly installed, 0 to remove and 67 not upgraded.
+Need to get 8479 kB of archives.
+After this operation, 33.7 MB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-multimedia-utils arm64 35.1.0-20220825113828 [253 kB]
+Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-nvsci arm64 35.1.0-20220825113828 [330 kB]
+Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-multimedia arm64 35.1.0-20220825113828 [7896 kB]
+Fetched 8479 kB in 1s (6809 kB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package nvidia-l4t-multimedia-utils.
+(Reading database ... 41616 files and directories currently installed.)
+Preparing to unpack .../nvidia-l4t-multimedia-utils_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-multimedia-utils (35.1.0-20220825113828) ...
+Selecting previously unselected package nvidia-l4t-nvsci.
+Preparing to unpack .../nvidia-l4t-nvsci_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-nvsci (35.1.0-20220825113828) ...
+Selecting previously unselected package nvidia-l4t-multimedia.
+Preparing to unpack .../nvidia-l4t-multimedia_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-multimedia (35.1.0-20220825113828) ...
+Setting up nvidia-l4t-multimedia-utils (35.1.0-20220825113828) ...
+Setting up nvidia-l4t-nvsci (35.1.0-20220825113828) ...
+Setting up nvidia-l4t-multimedia (35.1.0-20220825113828) ...
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-gstreamer
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
+Use &#39;apt autoremove&#39; to remove them.
+The following additional packages will be installed:
+libegl1-mesa nvidia-l4t-camera
+The following NEW packages will be installed:
+libegl1-mesa nvidia-l4t-camera nvidia-l4t-gstreamer
+0 upgraded, 3 newly installed, 0 to remove and 67 not upgraded.
+Need to get 6971 kB of archives.
+After this operation, 26.7 MB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-camera arm64 35.1.0-20220825113828 [5392 kB]
+Get:2 http://ports.ubuntu.com/ubuntu-ports focal-updates/universe arm64 libegl1-mesa arm64 21.2.6-0ubuntu0.1~20.04.2 [6408 B]
+Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-gstreamer arm64 35.1.0-20220825113828 [1573 kB]
+Fetched 6971 kB in 1s (6837 kB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package libegl1-mesa:arm64.
+(Reading database ... 41701 files and directories currently installed.)
+Preparing to unpack .../libegl1-mesa_21.2.6-0ubuntu0.1~20.04.2_arm64.deb ...
+Unpacking libegl1-mesa:arm64 (21.2.6-0ubuntu0.1~20.04.2) ...
+Selecting previously unselected package nvidia-l4t-camera.
+Preparing to unpack .../nvidia-l4t-camera_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-camera (35.1.0-20220825113828) ...
+Selecting previously unselected package nvidia-l4t-gstreamer.
+Preparing to unpack .../nvidia-l4t-gstreamer_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-gstreamer (35.1.0-20220825113828) ...
+Setting up libegl1-mesa:arm64 (21.2.6-0ubuntu0.1~20.04.2) ...
+Setting up nvidia-l4t-camera (35.1.0-20220825113828) ...
+Setting up nvidia-l4t-gstreamer (35.1.0-20220825113828) ...
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# ldconfig
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
+
+(gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.430: Failed to load plugin &#39;/usr/lib/aarch64-linux-gnu/gstreamer-1.0/libgstchromaprint.so&#39;: libavcodec.so.58: cannot open shared object file: No such file or directory
+No EGL Display
+nvbufsurftransform: Could not get EGL display connection
+nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+nvbuf_utils: Could not get EGL display connection
+nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+(Argus) Error FileOperationFailed: Connecting to nvargus-daemon failed: No such file or directory (in src/rpc/socket/client/SocketClientDispatch.cpp, function openSocketConnection(), line 204)
+(Argus) Error FileOperationFailed: Cannot create camera provider (in src/rpc/socket/client/SocketClientDispatch.cpp, function createCameraProvider(), line 106)
+
+(gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.722: Failed to load plugin &#39;/usr/lib/aarch64-linux-gnu/gstreamer-1.0/deepstream/libnvdsgst_udp.so&#39;: librivermax.so.0: cannot open shared object file: No such file or directory
+
+(gst-plugin-scanner:508): GStreamer-WARNING **: 13:15:12.745: Failed to load plugin &#39;/usr/lib/aarch64-linux-gnu/gstreamer-1.0/deepstream/libnvdsgst_inferserver.so&#39;: libtritonserver.so: cannot open shared object file: No such file or directory
+No EGL Display
+nvbufsurftransform: Could not get EGL display connection
+nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+nvbuf_utils: Could not get EGL display connection
+nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+nvbuf_utils: Could not get EGL display connection
+nvbuf_utils: ERROR getting proc addr of eglCreateImageKHR
+nvbuf_utils: ERROR getting proc addr of eglDestroyImageKHR
+Opening in BLOCKING MODE
+Opening in BLOCKING MODE
+WARNING: Deserialize engine failed because file path: /opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine open error
+0:00:04.369571651   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:&lt;primary_gie&gt; NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::deserializeEngineAndBackend() &lt;nvdsinfer_context_impl.cpp:1897&gt; [UID = 1]: deserialize engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed
+0:00:04.515170200   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:&lt;primary_gie&gt; NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::generateBackendContext() &lt;nvdsinfer_context_impl.cpp:2002&gt; [UID = 1]: deserialize backend context from engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed, try rebuild
+0:00:04.515215641   507 0xaaab19f2e430 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:&lt;primary_gie&gt; NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() &lt;nvdsinfer_context_impl.cpp:1923&gt; [UID = 1]: Trying to create engine from model files
+WARNING: [TRT]: The implicit batch dimension mode has been deprecated. Please create the network with NetworkDefinitionCreationFlag::kEXPLICIT_BATCH flag whenever possible.
+0:00:52.282508491   507 0xaaab19f2e430 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:&lt;primary_gie&gt; NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() &lt;nvdsinfer_context_impl.cpp:1955&gt; [UID = 1]: serialize cuda engine to file: /opt/nvidia/deepstream/deepstream-6.1/samples/models/Primary_Detector/resnet10.caffemodel_b1_gpu0_int8.engine successfully
+INFO: [Implicit Engine Info]: layers num: 3
+0   INPUT  kFLOAT input_1         3x368x640
+1   OUTPUT kFLOAT conv2d_bbox     16x23x40
+2   OUTPUT kFLOAT conv2d_cov/Sigmoid 4x23x40
+
+nvbufsurface: eglGetDisplay failed with error 0x300c
+nvbufsurface: Can&#39;t get EGL display
+0:00:52.459813791   507 0xaaab19f2e430 WARN                 nvinfer gstnvinfer.cpp:943:gst_nvinfer_start:&lt;primary_gie&gt; error: Failed to set buffer pool to active
+** ERROR: &lt;main:716&gt;: Failed to set pipeline to PAUSED
+Quitting
+ERROR from primary_gie: Failed to set buffer pool to active
+Debug info: /dvs/git/dirty/git-master_linux/deepstream/sdk/src/gst-plugins/gst-nvinfer/gstnvinfer.cpp(943): gst_nvinfer_start (): /GstPipeline:pipeline/GstBin:primary_gie_bin/GstNvInfer:primary_gie
+App run failed
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1#
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# apt-get install nvidia-l4t-3d-core
+Reading package lists... Done
+Building dependency tree
+Reading state information... Done
+The following packages were automatically installed and are no longer required:
+libavfilter7 libavformat58 libbluray2 libmysofa1 libpostproc55 librubberband2 libssh-gcrypt-4 libswscale5 libvidstab1.1
+Use &#39;apt autoremove&#39; to remove them.
+The following additional packages will be installed:
+nvidia-l4t-firmware nvidia-l4t-init nvidia-l4t-libvulkan nvidia-l4t-wayland nvidia-l4t-x11
+The following NEW packages will be installed:
+nvidia-l4t-3d-core nvidia-l4t-firmware nvidia-l4t-init nvidia-l4t-libvulkan nvidia-l4t-wayland nvidia-l4t-x11
+0 upgraded, 6 newly installed, 0 to remove and 67 not upgraded.
+Need to get 67.9 MB of archives.
+After this operation, 200 MB of additional disk space will be used.
+Do you want to continue? [Y/n] Y
+Get:1 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-firmware arm64 35.1.0-20220825113828 [1972 kB]
+Get:2 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-init arm64 35.1.0-20220825113828 [91.4 kB]
+Get:3 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-libvulkan arm64 35.1.0-20220825113828 [157 kB]
+Get:4 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-wayland arm64 35.1.0-20220825113828 [40.4 kB]
+Get:5 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-x11 arm64 35.1.0-20220825113828 [107 kB]
+Get:6 https://repo.download.nvidia.com/jetson/t234 r35.1/main arm64 nvidia-l4t-3d-core arm64 35.1.0-20220825113828 [65.5 MB]
+Fetched 67.9 MB in 6s (12.3 MB/s)
+debconf: delaying package configuration, since apt-utils is not installed
+Selecting previously unselected package nvidia-l4t-firmware.
+(Reading database ... 41788 files and directories currently installed.)
+Preparing to unpack .../0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-firmware (35.1.0-20220825113828) ...
+dpkg: error processing archive /tmp/apt-dpkg-install-i4uic9/0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb (--unpack):
+unable to create &#39;/lib/firmware/tegra19x/nvhost_nvdec040_ns.fw.dpkg-new&#39; (while processing &#39;./lib/firmware/tegra19x/nvhost_nvdec040_ns.fw&#39;): Read-only file system
+dpkg: error while cleaning up:
+unable to remove newly-extracted version of &#39;/lib/firmware/tegra19x/nvhost_nvdec040_ns.fw&#39;: Read-only file system
+dpkg-deb: error: paste subprocess was killed by signal (Broken pipe)
+Selecting previously unselected package nvidia-l4t-init.
+Preparing to unpack .../1-nvidia-l4t-init_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-init (35.1.0-20220825113828) ...
+Selecting previously unselected package nvidia-l4t-libvulkan.
+Preparing to unpack .../2-nvidia-l4t-libvulkan_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-libvulkan (35.1.0-20220825113828) ...
+Selecting previously unselected package nvidia-l4t-wayland.
+Preparing to unpack .../3-nvidia-l4t-wayland_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-wayland (35.1.0-20220825113828) ...
+Selecting previously unselected package nvidia-l4t-x11.
+Preparing to unpack .../4-nvidia-l4t-x11_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-x11 (35.1.0-20220825113828) ...
+Selecting previously unselected package nvidia-l4t-3d-core.
+Preparing to unpack .../5-nvidia-l4t-3d-core_35.1.0-20220825113828_arm64.deb ...
+Unpacking nvidia-l4t-3d-core (35.1.0-20220825113828) ...
+Errors were encountered while processing:
+/tmp/apt-dpkg-install-i4uic9/0-nvidia-l4t-firmware_35.1.0-20220825113828_arm64.deb
+E: Sub-process /usr/bin/dpkg returned an error code (1)
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# ldconfig
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# deepstream-app -c samples/configs/deepstream-app/source2_1080p_dec_infer-resnet_demux_int8.txt
+Opening in BLOCKING MODE
+Opening in BLOCKING MODE
+WARNING: Deserialize engine failed because file path: /opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine open error
+0:00:03.729908716   598 0xaaaaf78a9c30 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:&lt;primary_gie&gt; NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::deserializeEngineAndBackend() &lt;nvdsinfer_context_impl.cpp:1897&gt; [UID = 1]: deserialize engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed
+0:00:03.872224256   598 0xaaaaf78a9c30 WARN                 nvinfer gstnvinfer.cpp:643:gst_nvinfer_logger:&lt;primary_gie&gt; NvDsInferContext[UID 1]: Warning from NvDsInferContextImpl::generateBackendContext() &lt;nvdsinfer_context_impl.cpp:2002&gt; [UID = 1]: deserialize backend context from engine from file :/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/../../models/Primary_Detector/resnet10.caffemodel_b1gpu0_int8.engine failed, try rebuild
+0:00:03.872269088   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:&lt;primary_gie&gt; NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() &lt;nvdsinfer_context_impl.cpp:1923&gt; [UID = 1]: Trying to create engine from model files
+WARNING: [TRT]: The implicit batch dimension mode has been deprecated. Please create the network with NetworkDefinitionCreationFlag::kEXPLICIT_BATCH flag whenever possible.
+0:00:49.976836324   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer.cpp:646:gst_nvinfer_logger:&lt;primary_gie&gt; NvDsInferContext[UID 1]: Info from NvDsInferContextImpl::buildModel() &lt;nvdsinfer_context_impl.cpp:1955&gt; [UID = 1]: serialize cuda engine to file: /opt/nvidia/deepstream/deepstream-6.1/samples/models/Primary_Detector/resnet10.caffemodel_b1_gpu0_int8.engine successfully
+INFO: [Implicit Engine Info]: layers num: 3
+0   INPUT  kFLOAT input_1         3x368x640
+1   OUTPUT kFLOAT conv2d_bbox     16x23x40
+2   OUTPUT kFLOAT conv2d_cov/Sigmoid 4x23x40
+
+0:00:50.211166901   598 0xaaaaf78a9c30 INFO                 nvinfer gstnvinfer_impl.cpp:328:notifyLoadModelStatus:&lt;primary_gie&gt; [UID 1]: Load new model:/opt/nvidia/deepstream/deepstream-6.1/samples/configs/deepstream-app/config_infer_primary.txt sucessfully
+
+Runtime commands:
+        h: Print this help
+        q: Quit
+
+        p: Pause
+        r: Resume
+
+
+**PERF:  FPS 0 (Avg)    FPS 1 (Avg)
+**PERF:  0.00 (0.00)    0.00 (0.00)
+** INFO: &lt;bus_callback:194&gt;: Pipeline ready
+
+WARNING from src_elem: No decoder available for type &#39;audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)119056e500, rate=(int)48000, channels=(int)2&#39;.
+Debug info: gsturidecodebin.c(920): unknown_type_cb (): /GstPipeline:pipeline/GstBin:multi_src_bin/GstBin:src_sub_bin0/GstURIDecodeBin:src_elem
+WARNING from src_elem: No decoder available for type &#39;audio/mpeg, mpegversion=(int)4, framed=(boolean)true, stream-format=(string)raw, level=(string)2, base-profile=(string)lc, profile=(string)lc, codec_data=(buffer)119056e500, rate=(int)48000, channels=(int)2&#39;.
+Debug info: gsturidecodebin.c(920): unknown_type_cb (): /GstPipeline:pipeline/GstBin:multi_src_bin/GstBin:src_sub_bin1/GstURIDecodeBin:src_elem
+Opening in BLOCKING MODE
+Opening in BLOCKING MODE
+NvMMLiteOpen : Block : BlockType = 261
+NvMMLiteOpen : Block : BlockType = 261
+NVMEDIA: Reading vendor.tegra.display-size : status: 6
+NVMEDIA: Reading vendor.tegra.display-size : status: 6
+NvMMLiteBlockCreate : Block : BlockType = 261
+NvMMLiteBlockCreate : Block : BlockType = 261
+** INFO: &lt;bus_callback:180&gt;: Pipeline running
+
+NvMMLiteOpen : Block : BlockType = 4
+NvMMLiteOpen : Block : BlockType = 4
+===== NVMEDIA: NVENC =====
+===== NVMEDIA: NVENC =====
+NvMMLiteBlockCreate : Block : BlockType = 4
+NvMMLiteBlockCreate : Block : BlockType = 4
+H264: Profile = 66, Level = 0
+NVMEDIA: Need to set EMC bandwidth : 846000
+NVMEDIA_ENC: bBlitMode is set to TRUE
+H264: Profile = 66, Level = 0
+NVMEDIA: Need to set EMC bandwidth : 846000
+NVMEDIA_ENC: bBlitMode is set to TRUE
+**PERF:  33.49 (33.33)  33.59 (33.37)
+**PERF:  30.02 (31.53)  30.01 (31.55)
+**PERF:  29.92 (31.02)  29.97 (31.03)
+**PERF:  29.98 (30.76)  30.00 (30.77)
+**PERF:  29.90 (30.61)  29.83 (30.61)
+**PERF:  29.84 (30.50)  29.83 (30.51)
+**PERF:  30.39 (30.46)  30.40 (30.47)
+**PERF:  29.61 (30.35)  29.78 (30.41)
+**PERF:  29.99 (30.34)  30.00 (30.36)
+** INFO: &lt;bus_callback:217&gt;: Received EOS. Exiting ...
+
+Quitting
+App run successful
+root@jao-JP502-bone300-k8:/opt/nvidia/deepstream/deepstream-6.1# 
+</code></pre></div>
+</div>
+</div>
+</div>
+</details>
+<h3 id="troubleshooting">Troubleshooting</h3>
+<p>When DeepStream app shows an error related to GStreamer, you may need to perform the following. </p>
+<div class="highlight"><pre><span></span><code>rm ~/.cache/gstreamer-1.0/registry.aarch64.bin 
+</code></pre></div>
+<h2 id="resulting-4t-configuration">Resulting 4T configuration</h2>
+<h3 id="bone300-k8"><code>bone300</code> + <code>k8</code></h3>
+<details class="example">
+<summary>Total and available disk size</summary>
+<div class="highlight"><pre><span></span><code>Filesystem      Size  Used Avail Use% Mounted on
+/dev/mmcblk0p1   54G  682M   51G   2% /
+</code></pre></div>
+</details>
+<details class="example">
+<summary>Installed package list</summary>
+<div class="highlight"><pre><span></span><code>    624 KiB     adduser                         add and remove users and groups
+   4007 KiB     apt                             commandline package manager
+    387 KiB     base-files                      Debian base system miscellaneous files
+    229 KiB     base-passwd                     Debian base system master password and group files
+   1688 KiB     bash                            GNU Bourne Again SHell
+    107 KiB     binutils                        GNU assembler, linker and binary utilities
+  13184 KiB     binutils-aarch64-linux-gnu      GNU binary utilities, for aarch64-linux-gnu target
+    424 KiB     binutils-common                 Common files for the GNU assembler, linker and binary utilities
+    109 KiB     bridge-utils                    Utilities for configuring the Linux Ethernet bridge
+    585 KiB     bsdmainutils                    collection of more utilities from FreeBSD
+    284 KiB     bsdutils                        basic utilities from 4.4BSD-Lite
+     95 KiB     bubblewrap                      setuid wrapper for unprivileged chroot and namespace manipulation
+    175 KiB     bzip2                           high-quality block-sorting file compressor - utilities
+    375 KiB     ca-certificates                 Common CA certificates
+   6480 KiB     coreutils                       GNU core utilities
+    269 KiB     crda                            wireless Central Regulatory Domain Agent
+    386 KiB     cryptsetup                      disk encryption support - startup scripts
+    512 KiB     cryptsetup-bin                  disk encryption support - command line tools
+    220 KiB     dash                            POSIX-compliant shell
+    575 KiB     dbus                            simple interprocess messaging system (daemon and utilities)
+    127 KiB     dbus-user-session               simple interprocess messaging system (systemd --user integration)
+     78 KiB     dconf-gsettings-backend         simple configuration storage system - GSettings back-end
+    110 KiB     dconf-service                   simple configuration storage system - D-Bus service
+    284 KiB     dctrl-tools                     Command-line tools to process Debian package information
+    520 KiB     debconf                         Debian configuration management system
+    217 KiB     debianutils                     Miscellaneous utilities specific to Debian
+     64 KiB     debtree                         package dependency graphs on steroids
+    446 KiB     device-tree-compiler            Device Tree Compiler for Flat Device Trees
+    496 KiB     diffutils                       File comparison utilities
+    876 KiB     dirmngr                         GNU privacy guard - network certificate management service
+     17 KiB     distro-info-data                information about the distributions&#39; releases (data files)
+    277 KiB     dmsetup                         Linux Kernel Device Mapper userspace library
+     18 KiB     dns-root-data                   DNS root data including root zone and DNSSEC key
+    760 KiB     dnsmasq-base                    Small caching DNS proxy and DHCP/TFTP server
+   6697 KiB     dpkg                            Debian package management system
+   1410 KiB     e2fsprogs                       ext2/ext3/ext4 file system utilities
+    486 KiB     fdisk                           collection of partitioning utilities
+     82 KiB     file                            Recognize the type of data in a file using &quot;magic&quot; numbers
+    648 KiB     findutils                       utilities for finding files--find, xargs
+     99 KiB     fuse                            Filesystem in Userspace
+    265 KiB     gcc-10-base                     GCC, the GNU Compiler Collection (base package)
+    413 KiB     gnupg                           GNU privacy guard - a free PGP replacement
+    380 KiB     gnupg-l10n                      GNU privacy guard - localization files
+   1485 KiB     gnupg-utils                     GNU privacy guard - utility programs
+     50 KiB     gnupg2                          GNU privacy guard - a free PGP replacement (dummy transitional package)
+   1115 KiB     gpg                             GNU Privacy Guard -- minimalist public key operations
+    878 KiB     gpg-agent                       GNU privacy guard - cryptographic agent
+    275 KiB     gpg-wks-client                  GNU privacy guard - Web Key Service client
+    247 KiB     gpg-wks-server                  GNU privacy guard - Web Key Service server
+    389 KiB     gpgconf                         GNU privacy guard - core configuration utilities
+    548 KiB     gpgsm                           GNU privacy guard - S/MIME version
+    487 KiB     gpgv                            GNU privacy guard - signature verification tool
+    472 KiB     grep                            GNU grep, egrep and fgrep
+   3526 KiB     groff-base                      GNU troff text-formatting system (base system components)
+    244 KiB     gzip                            GNU compression utilities
+     46 KiB     hostname                        utility to set/show the host name or domain name
+    133 KiB     init-system-helpers             helper tools for all init systems
+   2680 KiB     iproute2                        networking and traffic control tools
+   2096 KiB     iptables                        administration tools for packet filtering and NAT
+    108 KiB     iputils-ping                    Tools to test the reachability of network hosts
+    722 KiB     isc-dhcp-client                 DHCP client for automatically obtaining an IP address
+   1479 KiB     isc-dhcp-server                 ISC DHCP server for automatic IP address assignment
+    275 KiB     iw                              tool for configuring Linux wireless devices
+    217 KiB     kexec-tools                     tools to support fast kexec reboots
+    827 KiB     keyboard-configuration          system-wide keyboard preferences
+    247 KiB     kmod                            tools for managing Linux kernel modules
+    132 KiB     krb5-locales                    internationalization support for MIT Kerberos
+    301 KiB     less                            pager program similar to more
+     65 KiB     libacl1                         access control list - shared library
+    159 KiB     libapparmor1                    changehat AppArmor library
+    213 KiB     libapt-pkg-perl                 Perl interface to libapt-pkg
+   3115 KiB     libapt-pkg6.0                   package management runtime library
+     51 KiB     libargon2-1                     memory-hard hashing function - runtime library
+    732 KiB     libasn1-8-heimdal               Heimdal Kerberos - ASN.1 library
+    101 KiB     libassuan0                      IPC library for the GnuPG components
+     52 KiB     libattr1                        extended attribute handling - shared library
+     24 KiB     libaudit-common                 Dynamic library for security auditing - common files
+    148 KiB     libaudit1                       Dynamic library for security auditing
+    124 KiB     libavahi-client3                Avahi client library
+    112 KiB     libavahi-common-data            Avahi common data files
+    109 KiB     libavahi-common3                Avahi common library
+   2092 KiB     libbinutils                     GNU binary utilities (private shared library)
+    443 KiB     libblkid1                       block device ID library
+    213 KiB     libbluetooth3                   Library to use the BlueZ Linux Bluetooth stack
+    694 KiB     libbrotli1                      library implementing brotli encoder and decoder (shared libraries)
+    191 KiB     libbsd0                         utility functions from BSD systems - shared library
+     94 KiB     libbz2-1.0                      high-quality block-sorting file compressor library - runtime
+   3186 KiB     libc-bin                        GNU C Library: Binaries
+  10468 KiB     libc6                           GNU C Library: Shared libraries
+     37 KiB     libcap-ng0                      An alternate POSIX capabilities library
+     52 KiB     libcap2                         POSIX 1003.1e capabilities (library)
+    100 KiB     libcap2-bin                     POSIX 1003.1e capabilities (utilities)
+     78 KiB     libcbor0.6                      library for parsing and generating CBOR (RFC 7049)
+     91 KiB     libcom-err2                     common error description library
+    221 KiB     libcrypt1                       libcrypt shared library
+    479 KiB     libcryptsetup12                 disk encryption support - shared library
+    185 KiB     libctf-nobfd0                   Compact C Type Format library (runtime, no BFD dependency)
+    121 KiB     libctf0                         Compact C Type Format library (runtime, BFD dependency)
+    649 KiB     libcurl3-gnutls                 easy-to-use client-side URL transfer library (GnuTLS flavour)
+   1613 KiB     libdb5.3                        Berkeley v5.3 Database Libraries [runtime]
+    462 KiB     libdbus-1-3                     simple interprocess messaging system (library)
+    102 KiB     libdconf1                       simple configuration storage system - runtime library
+     69 KiB     libdebconfclient0               Debian Configuration Management System (C-implementation library)
+    492 KiB     libdevmapper1.02.1              Linux Kernel Device Mapper userspace library
+   2123 KiB     libdns-export1109               Exported DNS Shared Library
+     45 KiB     libdrm-common                   Userspace interface to kernel DRM services -- common files
+    124 KiB     libdrm2                         Userspace interface to kernel DRM services -- runtime
+    242 KiB     libedit2                        BSD editline and history libraries
+    192 KiB     libelf1                         library to read and write ELF files
+     25 KiB     libestr0                        Helper functions for handling strings (lib)
+    354 KiB     libexpat1                       XML parsing C library - runtime library
+    535 KiB     libext2fs2                      ext2/ext3/ext4 file system libraries
+     57 KiB     libfastjson4                    fast json library for C
+    549 KiB     libfdisk1                       fdisk partitioning library
+     58 KiB     libfdt1                         Flat Device Trees manipulation library
+     57 KiB     libffi7                         Foreign Function Interface library runtime
+    160 KiB     libfido2-1                      library for generating and verifying FIDO 2.0 objects
+    135 KiB     libfribidi0                     Free Implementation of the Unicode BiDi algorithm
+    300 KiB     libfuse2                        Filesystem in Userspace (library)
+     95 KiB     libgcc-s1                       GCC support library
+     95 KiB     libgcc1                         GCC support library (dependency package)
+    835 KiB     libgcrypt20                     LGPL Crypto library - runtime library
+     40 KiB     libgdbm-compat4                 GNU dbm database routines (legacy support runtime version) 
+     82 KiB     libgdbm6                        GNU dbm database routines (runtime version) 
+    249 KiB     libgirepository-1.0-1           Library for handling GObject introspection data (runtime library)
+   4042 KiB     libglib2.0-0                    GLib library of C routines
+    306 KiB     libglib2.0-bin                  Programs for the GLib library
+    104 KiB     libglib2.0-data                 Common files for GLib library
+    519 KiB     libgmp10                        Multiprecision arithmetic library
+   2244 KiB     libgnutls30                     GNU TLS library - main runtime library
+    168 KiB     libgpg-error0                   GnuPG development runtime library
+     59 KiB     libgpm2                         General Purpose Mouse - shared library
+    410 KiB     libgssapi-krb5-2                MIT Kerberos runtime libraries - krb5 GSS-API Mechanism
+    300 KiB     libgssapi3-heimdal              Heimdal Kerberos - GSSAPI support library
+    339 KiB     libgts-0.7-5                    library to deal with 3D computational surface meshes
+    187 KiB     libgts-bin                      utility binaries for libgts
+     60 KiB     libgudev-1.0-0                  GObject-based wrapper library for libudev
+    274 KiB     libhcrypto4-heimdal             Heimdal Kerberos - crypto library
+    104 KiB     libheimbase1-heimdal            Heimdal Kerberos - Base library
+     81 KiB     libheimntlm0-heimdal            Heimdal Kerberos - NTLM support library
+    237 KiB     libhogweed5                     low level cryptographic library (public-key cryptos)
+    348 KiB     libhx509-5-heimdal              Heimdal Kerberos - X509 support library
+    239 KiB     libidn11                        GNU Libidn library, implementation of IETF IDN specifications
+    208 KiB     libidn2-0                       Internationalized domain names (IDNA2008/TR46) library
+     78 KiB     libip4tc2                       netfilter libip4tc library
+     78 KiB     libip6tc2                       netfilter libip6tc library
+     86 KiB     libirs-export161                Exported IRS Shared Library
+    497 KiB     libisc-export1105               Exported ISC Shared Library
+    215 KiB     libisccfg-export163             Exported ISC CFG Shared Library
+     56 KiB     libiw30                         Wireless tools - library
+     79 KiB     libjansson4                     C library for encoding, decoding and manipulating JSON data
+    729 KiB     libjs-jquery                    JavaScript library for dynamic web applications
+     88 KiB     libjson-c4                      JSON manipulation library - shared library
+    291 KiB     libk5crypto3                    MIT Kerberos runtime libraries - Crypto Library
+     42 KiB     libkeyutils1                    Linux Key Management Utilities (library)
+    133 KiB     libkmod2                        libkmod shared library
+    644 KiB     libkrb5-26-heimdal              Heimdal Kerberos - libraries
+   1097 KiB     libkrb5-3                       MIT Kerberos runtime libraries
+    163 KiB     libkrb5support0                 MIT Kerberos runtime libraries - Support library
+    226 KiB     libksba8                        X.509 and CMS support library
+    507 KiB     libldap-2.4-2                   OpenLDAP libraries
+    102 KiB     libldap-common                  OpenLDAP common files for libraries
+     54 KiB     liblocale-gettext-perl          module using libc functions for internationalization in Perl
+    418 KiB     libltdl7                        System independent dlopen wrapper for GNU libtool
+    140 KiB     liblz4-1                        Fast LZ compression algorithm library - runtime
+    251 KiB     liblzma5                        XZ-format compression library
+   5723 KiB     libmagic-mgc                    File type determination library using &quot;magic&quot; numbers (compiled magic file)
+    208 KiB     libmagic1                       Recognize the type of data in a file using &quot;magic&quot; numbers - library
+    483 KiB     libmbim-glib4                   Support library to use the MBIM protocol
+     29 KiB     libmbim-proxy                   Proxy to communicate with MBIM ports
+   1121 KiB     libmm-glib0                     D-Bus service for managing modems - shared libraries
+     42 KiB     libmnl0                         minimalistic Netlink communication library
+    478 KiB     libmount1                       device mounting library
+    235 KiB     libmpdec2                       library for decimal floating point arithmetic (runtime library)
+    308 KiB     libncurses6                     shared libraries for terminal handling
+    392 KiB     libncursesw6                    shared libraries for terminal handling (wide character support)
+     40 KiB     libndp0                         Library for Neighbor Discovery Protocol
+    134 KiB     libnetfilter-conntrack3         Netfilter netlink-conntrack library
+    384 KiB     libnettle7                      low level cryptographic library (symmetric and one-way cryptos)
+    188 KiB     libnewt0.52                     Not Erik&#39;s Windowing Toolkit - text mode windowing with slang
+     40 KiB     libnfnetlink0                   Netfilter netlink library
+    216 KiB     libnftnl11                      Netfilter nftables userspace API library
+    208 KiB     libnghttp2-14                   library implementing HTTP/2 protocol (shared library)
+    176 KiB     libnl-3-200                     library for dealing with netlink sockets
+     52 KiB     libnl-genl-3-200                library for dealing with netlink sockets - generic netlink
+    531 KiB     libnl-route-3-200               library for dealing with netlink sockets - route interface
+   1394 KiB     libnm0                          GObject-based client library for NetworkManager
+     32 KiB     libnpth0                        replacement for GNU Pth using system threads
+    404 KiB     libnss-systemd                  nss module providing dynamic user and group name resolution
+     68 KiB     libnuma1                        Libraries for controlling NUMA policy
+   1299 KiB     libp11-kit0                     library for loading and coordinating access to PKCS#11 modules - runtime
+    941 KiB     libpam-modules                  Pluggable Authentication Modules for PAM
+    290 KiB     libpam-modules-bin              Pluggable Authentication Modules for PAM - helper binaries
+    304 KiB     libpam-runtime                  Runtime support for the PAM library
+    625 KiB     libpam-systemd                  system and service manager - PAM module
+    219 KiB     libpam0g                        Pluggable Authentication Modules library
+    445 KiB     libparted2                      disk partition manipulator - shared library
+    325 KiB     libpcap0.8                      system interface for user-level packet capture
+    105 KiB     libpci3                         PCI utilities (shared library)
+    524 KiB     libpcre2-8-0                    New Perl Compatible Regular Expression Library- 8 bit runtime files
+    601 KiB     libpcre3                        Old Perl 5 Compatible Regular Expression Library - runtime files
+    189 KiB     libpcrecpp0v5                   Old Perl 5 Compatible Regular Expression Library - C++ runtime files
+     71 KiB     libpcsclite1                    Middleware to access a smart card using PC/SC (library)
+  26547 KiB     libperl5.30                     shared Perl library
+     76 KiB     libpipeline1                    Unix process pipeline manipulation library
+     71 KiB     libpolkit-agent-1-0             PolicyKit Authentication Agent API
+    153 KiB     libpolkit-gobject-1-0           PolicyKit Authorization API
+    120 KiB     libpopt0                        lib for parsing cmdline parameters
+    123 KiB     libprocps8                      library for accessing process information from /proc
+    140 KiB     libproxy1v5                     automatic proxy configuration management library (shared)
+     87 KiB     libpsl5                         Library for Public Suffix List (shared libraries)
+     38 KiB     libpython3-stdlib               interactive high-level object-oriented language (default python3 version)
+   5357 KiB     libpython3.8                    Shared Python runtime library (version 3.8)
+   4785 KiB     libpython3.8-minimal            Minimal subset of the Python language (version 3.8)
+   7655 KiB     libpython3.8-stdlib             Interactive high-level object-oriented language (standard library, version 3.8)
+   3468 KiB     libqmi-glib5                    Support library to use the Qualcomm MSM Interface (QMI) protocol
+     31 KiB     libqmi-proxy                    Proxy to communicate with QMI ports
+    428 KiB     libreadline8                    GNU readline and history libraries, run-time libraries
+    136 KiB     libroken18-heimdal              Heimdal Kerberos - roken support library
+    131 KiB     librtmp1                        toolkit for RTMP streams (shared library)
+    148 KiB     libsasl2-2                      Cyrus SASL - authentication abstraction library
+    224 KiB     libsasl2-modules                Cyrus SASL - pluggable authentication modules
+     61 KiB     libsasl2-modules-db             Cyrus SASL - pluggable authentication modules (DB)
+    140 KiB     libseccomp2                     high level interface to Linux seccomp filter
+    194 KiB     libselinux1                     SELinux runtime shared libraries
+     36 KiB     libsemanage-common              Common files for SELinux policy management libraries
+    289 KiB     libsemanage1                    SELinux policy management library
+    730 KiB     libsepol1                       SELinux library for manipulating binary security policies
+   1731 KiB     libslang2                       S-Lang programming library - runtime version
+    342 KiB     libsmartcols1                   smart column output alignment library
+   1300 KiB     libsqlite3-0                    SQLite 3 shared library
+    103 KiB     libss2                          command-line interface parsing library
+    479 KiB     libssh-4                        tiny C SSH library (OpenSSL flavor)
+   3613 KiB     libssl1.1                       Secure Sockets Layer toolkit - shared libraries
+   2389 KiB     libstdc++6                      GNU Standard C++ Library v3
+    874 KiB     libsystemd0                     systemd utility library
+    116 KiB     libtasn1-6                      Manage ASN.1 structures (runtime)
+     41 KiB     libteamdctl0                    library for communication with `teamd` process
+    522 KiB     libtinfo5                       shared low-level terminfo library (legacy version)
+    529 KiB     libtinfo6                       shared low-level terminfo library for terminal handling
+    179 KiB     libuchardet0                    universal charset detection library - shared library
+    331 KiB     libudev1                        libudev shared library
+   1549 KiB     libunistring2                   Unicode string library for C
+    132 KiB     libusb-1.0-0                    userspace USB programming library
+    118 KiB     libuuid1                        Universally Unique ID library
+    204 KiB     libwind0-heimdal                Heimdal Kerberos - stringprep implementation
+    105 KiB     libwrap0                        Wietse Venema&#39;s TCP wrappers library
+    104 KiB     libxtables12                    netfilter xtables library
+    128 KiB     libyaml-0-2                     Fast YAML 1.1 parser and emitter library
+    607 KiB     libzstd1                        fast lossless compression algorithm
+    908 KiB     login                           system login tools
+    135 KiB     logrotate                       Log rotation utility
+     91 KiB     logsave                         save the output of a command in a log file
+     58 KiB     lsb-base                        Linux Standard Base init script functionality
+     66 KiB     lsb-release                     Linux Standard Base version reporting utility
+    225 KiB     mawk                            Pattern scanning and text processing language
+    114 KiB     mime-support                    MIME files &#39;mime.types&#39; &amp; &#39;mailcap&#39;, and support programs
+   4004 KiB     modemmanager                    D-Bus service for managing modems
+    406 KiB     mount                           tools for mounting and manipulating filesystems
+    381 KiB     ncurses-base                    basic terminal type definitions
+    606 KiB     ncurses-bin                     terminal-related programs and man pages
+   4183 KiB     ncurses-term                    additional terminal type definitions
+    808 KiB     net-tools                       NET-3 networking toolkit
+     43 KiB     netbase                         Basic TCP/IP networking system
+   7212 KiB     network-manager                 network management framework (daemon and userspace tools)
+    212 KiB     network-manager-pptp            network management framework (PPTP plugin core)
+     31 KiB     nvidia-l4t-apt-source           NVIDIA L4T apt source list debian package
+   1504 KiB     nvidia-l4t-configs              NVIDIA configs debian package
+  10422 KiB     nvidia-l4t-core                 NVIDIA Core Package
+  22790 KiB     nvidia-l4t-cuda                 NVIDIA CUDA Package
+  16487 KiB     nvidia-l4t-firmware             NVIDIA Firmware Package
+  16737 KiB     nvidia-l4t-init                 NVIDIA Init debian package
+ 237542 KiB     nvidia-l4t-kernel               NVIDIA Kernel Package
+   4772 KiB     nvidia-l4t-kernel-dtbs          NVIDIA Kernel DTB Package
+     65 KiB     nvidia-l4t-nvfancontrol         NVIDIA Nvfancontrol debian package
+   3336 KiB     nvidia-l4t-tools                NVIDIA Public Test Tools Package
+   3961 KiB     openssh-client                  secure shell (SSH) client, for secure access to remote machines
+   1471 KiB     openssh-server                  secure shell (SSH) server, for secure access from remote machines
+    137 KiB     openssh-sftp-server             secure shell (SSH) sftp server module, for SFTP access from remote machines
+   1217 KiB     openssl                         Secure Sockets Layer toolkit - cryptographic utility
+    159 KiB     parted                          disk partition manipulator
+   2536 KiB     passwd                          change and administer password and group data
+   1193 KiB     pci.ids                         PCI ID Repository
+    175 KiB     pciutils                        PCI utilities
+    745 KiB     perl                            Larry Wall&#39;s Practical Extraction and Report Language
+  10407 KiB     perl-base                       minimal Perl system
+  17226 KiB     perl-modules-5.30               Core Perl modules
+     92 KiB     pinentry-curses                 curses-based PIN or pass-phrase entry dialog for GnuPG
+    524 KiB     policykit-1                     framework for managing administrative policies and privileges
+    961 KiB     ppp                             Point-to-Point Protocol (PPP) - daemon
+    109 KiB     pptp-linux                      Point-to-Point Tunneling Protocol (PPTP) Client
+    803 KiB     procps                          /proc file system utilities
+    268 KiB     python-apt-common               Python interface to libapt-pkg (locales)
+    189 KiB     python3                         interactive high-level object-oriented language (default python3 version)
+    319 KiB     python3-certifi                 root certificates for validating SSL certs and verifying TLS hosts (python3)
+    411 KiB     python3-chardet                 universal character encoding detector for Python3
+     69 KiB     python3-distro                  Linux OS platform information API
+    289 KiB     python3-idna                    Python IDNA2008 (RFC 5891) handling (Python 3)
+    120 KiB     python3-minimal                 minimal subset of the Python language (default python3 version)
+    567 KiB     python3-pkg-resources           Package Discovery and Resource Access using pkg_resources
+    228 KiB     python3-requests                elegant and simple HTTP library for Python3, built for human beings
+     58 KiB     python3-six                     Python 2 and 3 compatibility library (Python 3 interface)
+    414 KiB     python3-urllib3                 HTTP library with thread-safe connection pooling for Python3
+    509 KiB     python3.8                       Interactive high-level object-oriented language (version 3.8)
+   5232 KiB     python3.8-minimal               Minimal subset of the Python language (version 3.8)
+     79 KiB     readline-common                 GNU readline and history libraries, common files
+    195 KiB     resolvconf                      name server information handler
+    673 KiB     rsync                           fast, versatile, remote (and local) file-copying tool
+   1524 KiB     rsyslog                         reliable system and kernel logging daemon
+    328 KiB     sed                             GNU stream editor for filtering/transforming text
+     62 KiB     sensible-utils                  Utilities for sensible alternative selection
+     54 KiB     ssh-import-id                   securely retrieve an SSH public key and install it locally
+   2124 KiB     sudo                            Provide limited super user privileges to specific users
+  14692 KiB     systemd                         system and service manager
+    177 KiB     systemd-sysv                    system and service manager - SysV links
+    235 KiB     systemd-timesyncd               minimalistic service to synchronize local time with NTP servers
+     62 KiB     sysvinit-utils                  System-V-like utilities
+    880 KiB     tar                             GNU version of the tar archiving utility
+    112 KiB     tree                            displays an indented directory tree, in color
+     46 KiB     ubuntu-keyring                  GnuPG keys of the Ubuntu archive
+    188 KiB     ucf                             Update Configuration File(s): preserve user changes to config files
+   9074 KiB     udev                            /dev/ and hotplug management daemon
+    158 KiB     usb-modeswitch                  mode switching tool for controlling &quot;flip flop&quot; USB devices
+     97 KiB     usb-modeswitch-data             mode switching data for usb-modeswitch
+   4181 KiB     util-linux                      miscellaneous system utilities
+    964 KiB     wget                            retrieves files from the web
+     34 KiB     wireless-regdb                  wireless regulatory database
+    287 KiB     wireless-tools                  Tools for manipulating Linux Wireless Extensions
+   3255 KiB     wpasupplicant                   client support for WPA and WPA2 (IEEE 802.11i)
+    159 KiB     zlib1g                          compression library - runtime
+</code></pre></div>
+</details>
+<details class="example">
+<summary>Files and Directories over 10MB in tree format</summary>
+<blockquote>
+<p>After installing <code>tree</code> package.</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code>├── [ 78M]  boot
+│   ├── [ 32M]  Image
+│   ├── [ 32M]  Image.t19x
+├── [104M]  opt
+│   ├── [ 16M]  nvidia
+│   │   └── [ 16M]  l4t-usb-device-mode
+│   │       ├── [ 16M]  filesystem.img
+│   └── [ 88M]  ota_package
+│       ├── [ 46M]  t19x
+│       │   └── [ 46M]  kernel_only_payload
+│       └── [ 41M]  t23x
+│           └── [ 41M]  kernel_only_payload
+├── [ 16M]  run
+│   ├── [ 16M]  log
+│   │   └── [ 16M]  journal
+│   │       └── [ 16M]  113fa16107c9376c1d9a4a086351e0bf
+├── [187M]  sys
+│   ├── [151M]  devices
+│   │   ├── [127M]  platform
+│   │   │   ├── [ 24M]  13e40000.host1x
+│   │   │   │   ├── [ 20M]  syncpt
+│   │   │   ├── [ 64M]  3270000.spi
+│   │   │   │   ├── [ 64M]  spi_master
+│   │   │   │   │   └── [ 64M]  spi6
+│   │   │   │   │       ├── [ 64M]  spi6.0
+│   │   │   │   │       │   ├── [ 64M]  mtd
+│   │   │   │   │       │   │   ├── [ 64M]  mtd0
+│   │   │   │   │       │   │   │   ├── [ 64M]  mtd0
+│   │   │   │   │       │   │   │   │   ├── [ 64M]  nvmem
+│   │   ├── [ 17M]  virtual
+│   ├── [ 26M]  kernel
+│   │   ├── [ 15M]  slab
+├── [408M]  usr
+│   ├── [ 59M]  bin
+│   ├── [295M]  lib
+│   │   ├── [138M]  aarch64-linux-gnu
+│   │   │   ├── [ 23M]  perl
+│   │   │   │   ├── [ 23M]  5.30.0
+│   │   │   │   │   ├── [ 13M]  auto
+│   │   │   ├── [ 32M]  tegra
+│   │   │   │   ├── [ 22M]  libcuda.so.1.1
+│   │   ├── [ 16M]  firmware
+│   │   ├── [ 81M]  modules
+│   │   │   └── [ 81M]  5.10.104-tegra
+│   │   │       ├── [ 79M]  kernel
+│   │   │       │   ├── [ 60M]  drivers
+│   │   │       │   │   ├── [ 35M]  net
+│   │   │       │   │   │   ├── [ 15M]  ethernet
+│   │   │       │   │   │   └── [ 18M]  wireless
+│   │   ├── [ 18M]  python3.8
+│   │   ├── [ 17M]  udev
+│   ├── [ 21M]  sbin
+│   ├── [ 32M]  share
+│   │   ├── [ 17M]  perl
+│   │   │   └── [ 17M]  5.30.0
+└── [215M]  var
+    ├── [ 77M]  cache
+    │   ├── [ 74M]  apt
+    │   │   ├── [ 37M]  pkgcache.bin
+    │   │   └── [ 37M]  srcpkgcache.bin
+    ├── [138M]  lib
+    │   ├── [131M]  apt
+    │   │   ├── [131M]  lists
+    │   │   │   ├── [ 47M]  ports.ubuntu.com_ubuntu-ports_dists_focal_universe_binary-arm64_Packages
+    │   │   │   ├── [ 26M]  ports.ubuntu.com_ubuntu-ports_dists_focal_universe_i18n_Translation-en
+</code></pre></div>
+</details>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var tab,labels=set.querySelector(".tabbed-labels");for(tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": ".", "features": ["navigation.indexes", "navigation.expand", "content.tabs.link"], "search": "assets/javascripts/workers/search.b8dbb3d2.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="assets/javascripts/bundle.af256bd8.min.js"></script>
+      
+    
+  </body>
+</html>
