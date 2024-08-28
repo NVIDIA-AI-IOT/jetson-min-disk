@@ -3,7 +3,8 @@ theme:
     name: "material"
     favicon: images/jetson-min-disk_favicon.png
     logo: images/jetson-min-disk_logo-white.png
-    font: Incosolata
+    font: 
+      text: Incosolata
     palette:
       - media: "(prefers-color-scheme: light)" 
         scheme: nvgreen
@@ -39,8 +40,8 @@ markdown_extensions:
   - md_in_html
   - tables
   - pymdownx.emoji:
-      emoji_index: !!python/name:materialx.emoji.twemoji
-      emoji_generator: !!python/name:materialx.emoji.to_svg
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
   - pymdownx.critic
   - pymdownx.caret
   - pymdownx.keys
